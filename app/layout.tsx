@@ -13,22 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-const title = 'Crypticworld - Text Encrypter'
-const description =
+const TITLE = 'Crypticworld - Text Encrypter'
+const DESCRIPTION =
   'Crypticworld is a lightweight web application built using Flask that allows users to hash any given text using a wide variety of hashing algorithms. This application encodes all input data using UTF-8 encoding before generating the hash.'
 
 export const metadata: Metadata = {
-  title: title,
-  description: description,
+  title: TITLE,
+  description: DESCRIPTION,
   openGraph: {
-    title: title,
-    description: description,
-    images: ['https://crypticworld.functionbasket.com/favicon.ico'],
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico'],
   },
   twitter: {
-    title: title,
-    description: description,
-    images: ['https://crypticworld.functionbasket.com/favicon.ico'],
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico'],
   },
 }
 

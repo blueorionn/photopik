@@ -1,6 +1,6 @@
 # Crypticworld
 
-![CrypticWorld Logo](https://crypticworld.functionbasket.com/img/crypticworld-site-img.png)
+![CrypticWorld Logo](https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/img/crypticworld-site-img.png)
 
 Crypticworld is a lightweight web application built using Nextjs that allows users to hash any given text using a wide variety of hashing algorithms.
 
