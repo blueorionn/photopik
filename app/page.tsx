@@ -30,8 +30,7 @@ export default function Home() {
               Hash Text
             </h2>
 
-            <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'>
-            </div>
+            <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'></div>
             <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'></div>
           </div>
           <div className='mt-6 flex w-full items-center justify-center py-6 md:mt-12 md:py-12 lg:mt-18 lg:py-18'>

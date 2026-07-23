@@ -23,12 +23,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    images: ['https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico'],
+    images: [
+      'https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico',
+    ],
   },
   twitter: {
     title: TITLE,
     description: DESCRIPTION,
-    images: ['https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico'],
+    images: [
+      'https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/favicon.ico',
+    ],
   },
 }
 
@@ -43,9 +47,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className='flex min-h-full flex-col'>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
