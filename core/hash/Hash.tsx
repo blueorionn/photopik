@@ -4,11 +4,11 @@ import { Check, Copy, Trash2 } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import algorithms from './algorithms.json'
 import { hashText } from './helper'
@@ -23,29 +23,28 @@ export default function HashPage() {
   const { copy } = useCopyToClipboard()
 
   // handle text/algorithm change
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false
 
-  const updateHash = async () => {
-    if (debounceText === '') {
-      setHashedText((prev) => (prev === '' ? prev : ''));
-      return;
+    const updateHash = async () => {
+      if (debounceText === '') {
+        setHashedText((prev) => (prev === '' ? prev : ''))
+        return
+      }
+
+      const hashed = await hashText(algorithm, debounceText, outputByte)
+
+      if (!cancelled) {
+        setHashedText((prev) => (prev === hashed ? prev : hashed))
+      }
     }
 
-    const hashed = await hashText(algorithm, debounceText, outputByte);
+    updateHash()
 
-    if (!cancelled) {
-      setHashedText((prev) => (prev === hashed ? prev : hashed));
+    return () => {
+      cancelled = true
     }
-  };
-
-  updateHash();
-
-  return () => {
-    cancelled = true;
-  };
-}, [algorithm, debounceText, outputByte]);
-
+  }, [algorithm, debounceText, outputByte])
 
   // copyOutput
   const handleCopyOutput = () => {
@@ -74,7 +73,10 @@ useEffect(() => {
         <h2 className='text-lg font-bold text-gray-800 md:text-xl lg:text-2xl dark:text-gray-300'>
           Hash Text
         </h2>
-        <Select value={algorithm} onValueChange={(value) => value && setAlgorithm(value)}>
+        <Select
+          value={algorithm}
+          onValueChange={(value) => value && setAlgorithm(value)}
+        >
           <SelectTrigger className='w-48 border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'>
             <SelectValue placeholder='Select algorithm' />
           </SelectTrigger>
@@ -89,7 +91,7 @@ useEffect(() => {
       </div>
       <section>
         <div className='grid grid-rows-2 xl:grid-cols-2 xl:grid-rows-1'>
-          <div className='h-full min-h-96 w-full overflow-hidden border-b-2 border-gray-300 xl:min-h-56rem xl:border-r-4 xl:border-b-0 dark:border-gray-700'>
+          <div className='xl:min-h-56rem h-full min-h-96 w-full overflow-hidden border-b-2 border-gray-300 xl:border-r-4 xl:border-b-0 dark:border-gray-700'>
             <div className='flex w-full items-center justify-start gap-8 border-y-2 border-gray-300 bg-gray-200 px-4 py-4 brightness-95 xl:px-8 dark:border-gray-800 dark:bg-gray-900 dark:brightness-[1.75]'>
               <span className='text-gray-800 dark:text-gray-300'>Input</span>
               {

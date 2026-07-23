@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-
 type Tool = {
   name: string
   description: string
@@ -26,7 +25,8 @@ const tools: Tool[] = [
   },
   {
     name: 'JWT Decoder',
-    description: 'Decode and inspect the header, payload, and signature of a JWT.',
+    description:
+      'Decode and inspect the header, payload, and signature of a JWT.',
     href: '/jwt',
     icon: KeyRound,
     status: 'coming-soon',
@@ -55,7 +55,8 @@ function ToolCard({ tool }: { tool: Tool }) {
     <Card
       className={cn(
         'h-full gap-3 rounded border-none bg-gray-400 py-4 transition-all dark:bg-gray-700',
-        isAvailable && 'hover:scale-105 hover:bg-gray-400/90 dark:hover:bg-gray-700/80',
+        isAvailable &&
+          'hover:scale-105 hover:bg-gray-400/90 dark:hover:bg-gray-700/80'
       )}
     >
       <CardHeader className='flex items-start justify-between'>
@@ -78,14 +79,20 @@ function ToolCard({ tool }: { tool: Tool }) {
         <CardTitle className='mb-1.5 text-base text-gray-800 lg:text-lg dark:text-gray-300'>
           {tool.name}
         </CardTitle>
-        <p className='text-sm text-gray-700 dark:text-gray-400'>{tool.description}</p>
+        <p className='text-sm text-gray-700 dark:text-gray-400'>
+          {tool.description}
+        </p>
       </CardContent>
     </Card>
   )
 
   if (!isAvailable) {
     return (
-      <div aria-disabled className='cursor-not-allowed opacity-70' title='Coming soon'>
+      <div
+        aria-disabled
+        className='cursor-not-allowed opacity-70'
+        title='Coming soon'
+      >
         {card}
       </div>
     )
@@ -108,10 +115,10 @@ export default function Home() {
               Cryptic World
             </h1>
             <h2 className='px-4 text-center text-base font-medium text-gray-700 lg:text-lg dark:text-gray-300'>
-              A growing toolkit for everyday security tasks — hash text,
-              decode JWTs, and encode or decode data, all in one place. This
-              application encodes all input data using UTF-8 before running
-              any operation.
+              A growing toolkit for everyday security tasks — hash text, decode
+              JWTs, and encode or decode data, all in one place. This
+              application encodes all input data using UTF-8 before running any
+              operation.
             </h2>
           </div>
         </section>

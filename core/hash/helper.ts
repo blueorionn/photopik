@@ -12,7 +12,7 @@ import {
   blake3,
   whirlpool,
   ripemd160,
-  crc32
+  crc32,
 } from 'hash-wasm'
 
 type Hasher = (text: string, outputByte: number) => Promise<string>
@@ -35,13 +35,13 @@ const HASHERS: Record<string, Hasher> = {
   blake3: (text) => blake3(text),
   whirlpool: (text) => whirlpool(text),
   ripemd160: (text) => ripemd160(text),
-  crc32: (text) => crc32(text)
+  crc32: (text) => crc32(text),
 }
 
 export async function hashText(
   algorithm: string,
   text: string,
-  outputByte = 64,
+  outputByte = 64
 ): Promise<string> {
   const hasher = HASHERS[algorithm]
 
