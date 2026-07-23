@@ -1,7 +1,98 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Binary, Hash, KeyRound, Link2 } from 'lucide-react'
 import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+
+
+type Tool = {
+  name: string
+  description: string
+  href: string
+  icon: typeof Hash
+  status: 'available' | 'coming-soon'
+}
+
+const tools: Tool[] = [
+  {
+    name: 'Hash Text',
+    description:
+      'Generate hashes from any text using algorithms like SHA-256, MD5, and Blake2b.',
+    href: '/hash',
+    icon: Hash,
+    status: 'available',
+  },
+  {
+    name: 'JWT Decoder',
+    description: 'Decode and inspect the header, payload, and signature of a JWT.',
+    href: '/jwt',
+    icon: KeyRound,
+    status: 'coming-soon',
+  },
+  {
+    name: 'Base64 Encode / Decode',
+    description: 'Convert text to and from Base64 in either direction.',
+    href: '/base64',
+    icon: Binary,
+    status: 'coming-soon',
+  },
+  {
+    name: 'URL Encode / Decode',
+    description: 'Percent-encode or decode strings for safe use in URLs.',
+    href: '/url',
+    icon: Link2,
+    status: 'coming-soon',
+  },
+]
+
+function ToolCard({ tool }: { tool: Tool }) {
+  const Icon = tool.icon
+  const isAvailable = tool.status === 'available'
+
+  const card = (
+    <Card
+      className={cn(
+        'h-full gap-3 rounded border-none bg-gray-400 py-4 transition-all dark:bg-gray-700',
+        isAvailable && 'hover:scale-105 hover:bg-gray-400/90 dark:hover:bg-gray-700/80',
+      )}
+    >
+      <CardHeader className='flex items-start justify-between'>
+        <Icon className='h-6 w-6 text-gray-800 dark:text-gray-300' />
+        {isAvailable ? (
+          <Badge className='gap-1.5 bg-[--clr-bs-green] text-gray-950 hover:bg-[--clr-bs-green]'>
+            <span className='h-1.5 w-1.5 rounded-full bg-gray-950' />
+            Available
+          </Badge>
+        ) : (
+          <Badge
+            variant='secondary'
+            className='bg-gray-500 text-gray-100 dark:bg-gray-800 dark:text-gray-400'
+          >
+            Coming soon
+          </Badge>
+        )}
+      </CardHeader>
+      <CardContent>
+        <CardTitle className='mb-1.5 text-base text-gray-800 lg:text-lg dark:text-gray-300'>
+          {tool.name}
+        </CardTitle>
+        <p className='text-sm text-gray-700 dark:text-gray-400'>{tool.description}</p>
+      </CardContent>
+    </Card>
+  )
+
+  if (!isAvailable) {
+    return (
+      <div aria-disabled className='cursor-not-allowed opacity-70' title='Coming soon'>
+        {card}
+      </div>
+    )
+  }
+
+  return <Link href={tool.href}>{card}</Link>
+}
 
 export default function Home() {
   return (
@@ -17,71 +108,28 @@ export default function Home() {
               Cryptic World
             </h1>
             <h2 className='px-4 text-center text-base font-medium text-gray-700 lg:text-lg dark:text-gray-300'>
-              Crypticworld is a lightweight web application built using Nextjs
-              that allows users to hash any given text using a wide variety of
-              hashing algorithms. This application encodes all input data using
-              UTF-8 encoding before generating the hash.
+              A growing toolkit for everyday security tasks — hash text,
+              decode JWTs, and encode or decode data, all in one place. This
+              application encodes all input data using UTF-8 before running
+              any operation.
             </h2>
           </div>
         </section>
+
         <section className='w-full bg-gray-300 px-6 py-6 md:py-12 lg:py-18 dark:bg-gray-900'>
           <div className='mx-auto max-w-5xl'>
             <h2 className="w-max text-base font-semibold text-gray-700 after:absolute after:mt-1 after:block after:h-1 after:w-[10%] after:bg-gray-400 after:opacity-80 after:content-[''] md:text-lg md:after:w-[5%] lg:text-xl dark:text-gray-300 after:dark:bg-gray-700">
-              Hash Text
+              Tools
             </h2>
 
-            <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'></div>
-            <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'></div>
-          </div>
-          <div className='mt-6 flex w-full items-center justify-center py-6 md:mt-12 md:py-12 lg:mt-18 lg:py-18'>
-            <div className='my-8 w-max'>
-              <div className='mx-auto h-2 w-8 rounded bg-[--clr-bs-green] md:w-12 lg:w-16'></div>
-              <div className='mx-auto py-4 md:py-6 lg:py-8'>
-                <h1 className='text-center text-lg font-semibold text-gray-800 lg:text-xl dark:text-gray-300'>
-                  See something missing?
-                </h1>
-                <h2 className='text-center text-base font-medium text-gray-700 md:mt-2 md:text-lg lg:text-xl dark:text-gray-400'>
-                  Feel free to contribute to the code on my GitHub repository.
-                </h2>
-              </div>
-              <div className='mt-4 flex flex-col items-center justify-center gap-2 md:mt-6 md:flex-row md:gap-4 lg:gap-8'>
-                <a
-                  href='https://github.com/blueorionn/crypticworld'
-                  target='_blank'
-                  className='flex items-center justify-center gap-4 rounded-full bg-gray-700 px-4 py-2 transition-all hover:bg-gray-600 md:px-8 md:py-4 dark:hover:bg-black'
-                >
-                  <Image
-                    src='/icon/github-mark-white.png'
-                    alt='Github logo'
-                    height={24}
-                    width={24}
-                    className='aspect-auto h-4 w-4 lg:h-6 lg:w-6'
-                  />
-                  <span className='font-semibold text-gray-300'>
-                    Contribute on Github
-                  </span>
-                </a>
-                <a
-                  href='https://x.com/SSwadhinTandi'
-                  target='_blank'
-                  className='flex items-center justify-center gap-4 rounded-full bg-gray-600 px-8 py-2 transition-all hover:bg-gray-700 md:px-16 md:py-4 dark:bg-black dark:hover:bg-gray-700'
-                >
-                  <span className='sr-only'>Twitter Profile</span>
-                  <Image
-                    src='/icon/x-logo.svg'
-                    alt='Twitter/X logo'
-                    height={16}
-                    width={16}
-                    className='aspect-auto h-2.5 lg:h-4'
-                  />
-                  <span className='font-semibold text-gray-300'>Follow Me</span>
-                </a>
-              </div>
+            <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-9 md:gap-8 lg:mt-12 lg:grid-cols-4'>
+              {tools.map((tool) => (
+                <ToolCard tool={tool} key={tool.name} />
+              ))}
             </div>
           </div>
         </section>
       </main>
-      <Footer />
     </>
   )
 }

@@ -6,16 +6,6 @@ import { Moon, Sun } from 'lucide-react'
 import { useThemeProvider } from '@/context/ThemeContext'
 import { Button } from '@/components/ui/button'
 
-// lucide-react ships the legacy bird mark under `Twitter`, not the current
-// X wordmark — kept as an inline SVG so the brand mark stays accurate.
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox='0 0 1200 1227' xmlns='http://www.w3.org/2000/svg' {...props}>
-      <path d='M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z' />
-    </svg>
-  )
-}
-
 export default function Header() {
   const { theme, setTheme } = useThemeProvider()
 
@@ -76,17 +66,6 @@ export default function Header() {
                 </svg>
               </a>{' '}
               <span className='sr-only'>Github Profile</span>
-            </a>
-          </Button>
-
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <a
-              href='https://x.com/SSwadhinTandi'
-              target='_blank'
-              rel='noopener noreferrer nofollow'
-            >
-              <XIcon className='h-3 w-3 fill-gray-500 transition-all hover:fill-gray-800 md:h-4 md:w-4 dark:fill-gray-400 dark:hover:fill-gray-200' />
-              <span className='sr-only'>Twitter Profile</span>
             </a>
           </Button>
         </div>
