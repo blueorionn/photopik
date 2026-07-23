@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import algorithms from '@/data/algorithms.json'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -32,19 +31,6 @@ export default function Home() {
             </h2>
 
             <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'>
-              {algorithms.map((algorithm) => {
-                return (
-                  <Link
-                    href={algorithm.url}
-                    key={algorithm.name}
-                    className='rounded bg-gray-400 p-4 transition-all hover:scale-105 dark:bg-gray-700'
-                  >
-                    <span className='text-base text-gray-800 lg:text-lg dark:text-gray-300'>
-                      {algorithm.title}
-                    </span>
-                  </Link>
-                )
-              })}
             </div>
             <div className='mt-6 grid grid-cols-2 gap-6 md:mt-9 md:grid-cols-4 md:gap-8 lg:mt-12'></div>
           </div>
