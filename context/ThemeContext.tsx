@@ -1,7 +1,11 @@
 'use client'
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { NextFontWithVariable } from 'next/dist/compiled/@next/font'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+  useCallback,
+} from 'react'
 
 interface ThemeContextType {
   theme: 'light' | 'dark'
@@ -10,41 +14,51 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export const ThemeProvider = ({
-  children,
-  geistSans,
-  geistMono,
-}: {
-  children: React.ReactNode
-  geistSans: NextFontWithVariable
-  geistMono: NextFontWithVariable
-}) => {
-  const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'dark')
-  const [mounted, setMounted] = useState(false)
+const STORAGE_KEY = 'theme'
 
-  // Set mounted to true on client to avoid SSR/client mismatch.
+function getServerSnapshot(): 'light' | 'dark' {
+  return 'dark'
+}
+
+function getTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return getServerSnapshot()
+  const stored = window.localStorage.getItem(STORAGE_KEY)
+  if (stored === 'light' || stored === 'dark') return stored
+  return 'dark'
+}
+
+function subscribeToTheme(callback: () => void): () => void {
+  window.addEventListener('storage', callback)
+  return () => window.removeEventListener('storage', callback)
+}
+
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getTheme,
+    getServerSnapshot
+  )
+
+  const setTheme = useCallback(
+    (
+      value: 'light' | 'dark' | ((prev: 'light' | 'dark') => 'light' | 'dark')
+    ) => {
+      const newTheme = typeof value === 'function' ? value(theme) : value
+      window.localStorage.setItem(STORAGE_KEY, newTheme)
+      window.dispatchEvent(
+        new StorageEvent('storage', { key: STORAGE_KEY, newValue: newTheme })
+      )
+    },
+    [theme]
+  )
+
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted)
-    return (
-      <ThemeContext.Provider value={{ theme, setTheme }}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </ThemeContext.Provider>
-    )
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${theme}`}
-      >
-        {children}
-      </body>
+      {children}
     </ThemeContext.Provider>
   )
 }

@@ -38,10 +38,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
-      <ThemeProvider geistMono={geistMono} geistSans={geistSans}>
-        {children}
-      </ThemeProvider>
+    <html
+      lang='en'
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className='flex min-h-full flex-col'>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
