@@ -47,12 +47,6 @@ export default function Header() {
               target='_blank'
               rel='noopener noreferrer nofollow'
             >
-              <a
-                href='https://github.com/blueorionn/calcify'
-                target='_blank'
-                rel='noopener noreferrer nofollow'
-                aria-label='GitHub Repository'
-              >
                 <svg
                   className='size-5'
                   viewBox='0 0 100 100'
@@ -66,7 +60,6 @@ export default function Header() {
                 </svg>
               </a>{' '}
               <span className='sr-only'>Github Profile</span>
-            </a>
           </Button>
         </div>
       </nav>
