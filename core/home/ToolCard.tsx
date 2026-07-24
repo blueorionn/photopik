@@ -52,34 +52,26 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const card = (
     <Card
       className={cn(
-        'h-full gap-3 rounded border-none bg-gray-400 py-4 transition-all dark:bg-gray-700',
-        isAvailable &&
-          'hover:scale-105 hover:bg-gray-400/90 dark:hover:bg-gray-700/80'
+        'bg-card h-full gap-3 rounded-lg border py-4 transition-all',
+        isAvailable && 'hover:bg-card/80 hover:scale-[1.02] hover:shadow-md'
       )}
     >
       <CardHeader className='flex items-start justify-between'>
-        <Icon className='h-6 w-6 text-gray-800 dark:text-gray-300' />
+        <Icon className='text-foreground/70 h-6 w-6' />
         {isAvailable ? (
-          <Badge className='gap-1.5 bg-[--clr-bs-green] text-gray-950 hover:bg-[--clr-bs-green]'>
-            <span className='h-1.5 w-1.5 rounded-full bg-gray-950' />
+          <Badge className='gap-1.5 bg-[--clr-bs-green] text-white hover:bg-[--clr-bs-green]'>
+            <span className='h-1.5 w-1.5 rounded-full bg-white' />
             Available
           </Badge>
         ) : (
-          <Badge
-            variant='secondary'
-            className='bg-gray-500 text-gray-100 dark:bg-gray-800 dark:text-gray-400'
-          >
-            Coming soon
-          </Badge>
+          <Badge variant='secondary'>Coming soon</Badge>
         )}
       </CardHeader>
       <CardContent>
-        <CardTitle className='mb-1.5 text-base text-gray-800 lg:text-lg dark:text-gray-300'>
+        <CardTitle className='text-card-foreground mb-1.5 text-base lg:text-lg'>
           {tool.name}
         </CardTitle>
-        <p className='text-sm text-gray-700 dark:text-gray-400'>
-          {tool.description}
-        </p>
+        <p className='text-muted-foreground text-sm'>{tool.description}</p>
       </CardContent>
     </Card>
   )

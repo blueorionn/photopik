@@ -7,14 +7,14 @@ export default function Home() {
       <Header />
       <main className='w-full'>
         <section
-          className='w-full bg-gray-200 py-6 pb-12 md:py-9 md:pb-18 lg:py-12 lg:pb-24 dark:bg-gray-800'
+          className='bg-muted/40 w-full py-6 pb-12 md:py-9 md:pb-18 lg:py-12 lg:pb-24'
           aria-label='secondary-header'
         >
           <div className='mx-auto max-w-5xl'>
-            <h1 className='mx-auto w-max py-4 text-2xl font-bold text-gray-900 lg:py-6 lg:text-3xl dark:text-gray-200'>
+            <h1 className='text-foreground mx-auto w-max py-4 text-2xl font-bold lg:py-6 lg:text-3xl'>
               Cryptic World
             </h1>
-            <h2 className='px-4 text-center text-base font-medium text-gray-700 lg:text-lg dark:text-gray-300'>
+            <h2 className='text-muted-foreground px-4 text-center text-base font-medium lg:text-lg'>
               A growing toolkit for everyday security tasks — hash text, decode
               JWTs, and encode or decode data, all in one place. This
               application encodes all input data using UTF-8 before running any
@@ -23,13 +23,13 @@ export default function Home() {
           </div>
         </section>
 
-        <section className='w-full bg-gray-300 px-6 py-6 md:py-12 lg:py-18 dark:bg-gray-900'>
+        <section className='bg-muted w-full px-6 py-6 md:py-12 lg:py-18'>
           <div className='mx-auto max-w-5xl'>
-            <h2 className="w-max text-base font-semibold text-gray-700 after:absolute after:mt-1 after:block after:h-1 after:w-[10%] after:bg-gray-400 after:opacity-80 after:content-[''] md:text-lg md:after:w-[5%] lg:text-xl dark:text-gray-300 after:dark:bg-gray-700">
+            <h2 className='text-foreground after:bg-border relative w-max text-base font-semibold after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-1/2 after:rounded-full md:text-lg lg:text-xl'>
               Tools
             </h2>
 
-            <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-9 md:gap-8 lg:mt-12 lg:grid-cols-4'>
+            <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-9 md:gap-8 lg:mt-12'>
               {tools.map((tool) => (
                 <ToolCard tool={tool} key={tool.name} />
               ))}

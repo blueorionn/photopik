@@ -10,7 +10,7 @@ export default function Header() {
   const { theme, setTheme } = useThemeProvider()
 
   return (
-    <header className='relative z-100 h-max w-full bg-gray-200 dark:bg-gray-800'>
+    <header className='border-border bg-background relative z-100 h-max w-full border-b'>
       <nav className='mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 md:py-6 lg:px-0'>
         <Link
           href='/'
@@ -23,7 +23,7 @@ export default function Header() {
             width={48}
             className='aspect-auto h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12'
           />
-          <h1 className='text-xl font-bold text-gray-800 lg:text-2xl dark:text-gray-200'>
+          <h1 className='text-foreground text-xl font-bold lg:text-2xl'>
             Cryptic<span className='text-[--clr-bs-green]'>world</span>
           </h1>
         </Link>
@@ -34,10 +34,10 @@ export default function Header() {
             variant='outline'
             size='icon'
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className='rounded-full border-gray-400 bg-gray-200 dark:border-gray-500 dark:bg-gray-800'
+            className='border-border bg-secondary hover:bg-accent rounded-full'
           >
-            <Sun className='h-4 w-4 scale-100 fill-gray-800 stroke-gray-800 transition-all dark:scale-0' />
-            <Moon className='absolute h-4 w-4 scale-0 fill-gray-400 stroke-gray-400 transition-all dark:scale-100' />
+            <Sun className='fill-foreground stroke-foreground h-4 w-4 scale-100 transition-all dark:scale-0' />
+            <Moon className='fill-muted-foreground stroke-muted-foreground absolute h-4 w-4 scale-0 transition-all dark:scale-100' />
             <span className='sr-only'>Toggle theme</span>
           </Button>
 
