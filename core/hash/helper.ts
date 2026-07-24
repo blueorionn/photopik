@@ -15,10 +15,8 @@ import {
   crc32,
 } from 'hash-wasm'
 
-type Hasher = (text: string, outputByte: number) => Promise<string>
+type Hasher = (text: string) => Promise<string>
 
-// Map each `algorithms.json` `name` to the hash-wasm function that produces
-// it. Add an entry here whenever a new algorithm shows up in algorithms.json.
 const HASHERS: Record<string, Hasher> = {
   md5: (text) => md5(text),
   sha1: (text) => sha1(text),
@@ -26,6 +24,7 @@ const HASHERS: Record<string, Hasher> = {
   sha256: (text) => sha256(text),
   sha384: (text) => sha384(text),
   sha512: (text) => sha512(text),
+  sha3_224: (text) => sha3(text, 224),
   sha3_256: (text) => sha3(text, 256),
   sha3_384: (text) => sha3(text, 384),
   sha3_512: (text) => sha3(text, 512),
@@ -40,8 +39,7 @@ const HASHERS: Record<string, Hasher> = {
 
 export async function hashText(
   algorithm: string,
-  text: string,
-  outputByte = 64
+  text: string
 ): Promise<string> {
   const hasher = HASHERS[algorithm]
 
@@ -49,72 +47,25 @@ export async function hashText(
     throw new Error(`Unsupported hash algorithm: ${algorithm}`)
   }
 
-  return hasher(text, outputByte)
+  return hasher(text)
 }
 
 export const ALGORITHMS = [
-  {
-    name: 'blake2b512',
-    title: 'Blake2b',
-  },
-  {
-    name: 'blake2s256',
-    title: 'Blake2s',
-  },
-  {
-    name: 'md5',
-    title: 'MD5',
-  },
-  {
-    name: 'sha1',
-    title: 'SHA1',
-  },
-  {
-    name: 'sha224',
-    title: 'SHA224',
-  },
-  {
-    name: 'sha256',
-    title: 'SHA256',
-  },
-  {
-    name: 'sha384',
-    title: 'SHA384',
-  },
-  {
-    name: 'sha512',
-    title: 'SHA512',
-  },
-  {
-    name: 'sha3-256',
-    title: 'SHA3-256',
-  },
-  {
-    name: 'sha3-224',
-    title: 'SHA3-224',
-  },
-  {
-    name: 'sha3-384',
-    title: 'SHA3-384',
-  },
-  {
-    name: 'sha3-512',
-    title: 'SHA3-512',
-  },
-  {
-    name: 'shake128',
-    title: 'SHAKE-128',
-  },
-  {
-    name: 'shake256',
-    title: 'SHAKE-256',
-  },
-  {
-    name: 'ripemd',
-    title: 'RIPEMD',
-  },
-  {
-    name: 'ripemd160',
-    title: 'RIPEMD-160',
-  },
+  { name: 'blake2b512', title: 'Blake2b' },
+  { name: 'blake2s256', title: 'Blake2s' },
+  { name: 'md5', title: 'MD5' },
+  { name: 'sha1', title: 'SHA1' },
+  { name: 'sha224', title: 'SHA224' },
+  { name: 'sha256', title: 'SHA256' },
+  { name: 'sha384', title: 'SHA384' },
+  { name: 'sha512', title: 'SHA512' },
+  { name: 'sha3_224', title: 'SHA3-224' },
+  { name: 'sha3_256', title: 'SHA3-256' },
+  { name: 'sha3_384', title: 'SHA3-384' },
+  { name: 'sha3_512', title: 'SHA3-512' },
+  { name: 'keccak256', title: 'Keccak-256' },
+  { name: 'blake3', title: 'Blake3' },
+  { name: 'whirlpool', title: 'Whirlpool' },
+  { name: 'ripemd160', title: 'RIPEMD-160' },
+  { name: 'crc32', title: 'CRC32' },
 ]
