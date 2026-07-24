@@ -10,11 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import algorithms from './algorithms.json'
-import { hashText } from './helper'
+import { hashText, ALGORITHMS } from './helper'
 
 export default function HashPage() {
-  const [algorithm, setAlgorithm] = useState(algorithms[0].name)
+  const [algorithm, setAlgorithm] = useState(ALGORITHMS[0].name)
   const [outputByte, setOutputByte] = useState<number>(64)
   const [text, setText] = useState('')
   const debounceText = useDebounce(text, 300)
@@ -81,7 +80,7 @@ export default function HashPage() {
             <SelectValue placeholder='Select algorithm' />
           </SelectTrigger>
           <SelectContent>
-            {algorithms.map((a) => (
+            {ALGORITHMS.map((a) => (
               <SelectItem value={a.name} key={a.name}>
                 {a.title}
               </SelectItem>
