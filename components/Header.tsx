@@ -17,7 +17,7 @@ export default function Header() {
           className='flex w-max items-center justify-center gap-1 md:gap-2'
         >
           <Image
-            src='/icon/crypticworld-logo.png'
+            src='/icons/crypticworld-logo.png'
             alt='Website Logo'
             height={48}
             width={48}

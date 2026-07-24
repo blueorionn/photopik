@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+import PwaRegister from '@/components/PwaRegister'
 import { ThemeProvider } from '@/context/ThemeContext'
+import './globals.css'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,11 +16,12 @@ const geistMono = Geist_Mono({
 
 const TITLE = 'Crypticworld - Text Encrypter'
 const DESCRIPTION =
-  'Crypticworld is a lightweight web application built using Flask that allows users to hash any given text using a wide variety of hashing algorithms. This application encodes all input data using UTF-8 encoding before generating the hash.'
+  'A growing toolkit for everyday security tasks — hash text, decode JWTs, and encode or decode data, all in one place. This application encodes all input data using UTF-8 before running any operation.'
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
+  manifest: '/manifest.json',
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
@@ -47,7 +49,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className='flex min-h-full flex-col'>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <PwaRegister />
+        </ThemeProvider>
       </body>
     </html>
   )
