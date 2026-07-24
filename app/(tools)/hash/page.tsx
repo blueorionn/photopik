@@ -1,5 +1,4 @@
 import { type Metadata } from 'next'
-import Header from '@/components/Header'
 import HashPage from '@/core/hash/HashPage'
 
 export const metadata: Metadata = {
@@ -7,10 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return (
-    <>
-      <Header />
-      <HashPage />
-    </>
-  )
+  return <HashPage />
 }
