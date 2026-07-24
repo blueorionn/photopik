@@ -5,7 +5,10 @@ export default function PwaRegister() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
 
-    if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
+    if (
+      window.location.protocol === 'http:' &&
+      window.location.hostname !== 'localhost'
+    ) {
       console.warn('[PWA] ServiceWorker requires HTTPS')
       return
     }
