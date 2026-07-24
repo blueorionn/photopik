@@ -67,7 +67,10 @@ export default function HashPage() {
             Hash Text
           </h2>
         </div>
-        <Select value={algorithm} onValueChange={setAlgorithm}>
+        <Select
+          value={algorithm}
+          onValueChange={(value) => value && setAlgorithm(value)}
+        >
           <SelectTrigger className='border-border bg-background text-foreground w-48'>
             <SelectValue placeholder='Select algorithm' />
           </SelectTrigger>
