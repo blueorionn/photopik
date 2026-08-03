@@ -26,7 +26,9 @@ export default function Home() {
 
         <section className='bg-muted w-full px-6 py-6 md:py-12 lg:py-18'>
           <div className='mx-auto max-w-5xl'>
-            <h2 className={`${roboto.className} text-foreground uppercase after:bg-border relative w-max text-base font-semibold after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-24 after:rounded-full md:text-lg lg:text-xl`}>
+            <h2
+              className={`${roboto.className} text-foreground after:bg-border relative w-max text-base font-semibold uppercase after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-24 after:rounded-full md:text-lg lg:text-xl`}
+            >
               Tools
             </h2>
 
