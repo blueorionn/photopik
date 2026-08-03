@@ -2,50 +2,9 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { Binary, Hash, KeyRound, Link2 } from 'lucide-react'
+import type { Tool } from '../data'
 
-export type Tool = {
-  name: string
-  description: string
-  href: string
-  icon: typeof Hash
-  status: 'available' | 'coming-soon'
-}
-
-export const tools: Tool[] = [
-  {
-    name: 'Hash Text',
-    description:
-      'Generate hashes from any text using algorithms like SHA-256, MD5, and Blake2b.',
-    href: '/hash',
-    icon: Hash,
-    status: 'available',
-  },
-  {
-    name: 'JWT Decoder',
-    description:
-      'Decode and inspect the header, payload, and signature of a JWT.',
-    href: '/jwt',
-    icon: KeyRound,
-    status: 'coming-soon',
-  },
-  {
-    name: 'Base64 Encode / Decode',
-    description: 'Convert text to and from Base64 in either direction.',
-    href: '/base64',
-    icon: Binary,
-    status: 'coming-soon',
-  },
-  {
-    name: 'URL Encode / Decode',
-    description: 'Percent-encode or decode strings for safe use in URLs.',
-    href: '/url',
-    icon: Link2,
-    status: 'coming-soon',
-  },
-]
-
-export function ToolCard({ tool }: { tool: Tool }) {
+export default function ToolCard({ tool }: { tool: Tool }) {
   const Icon = tool.icon
   const isAvailable = tool.status === 'available'
 
