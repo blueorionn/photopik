@@ -2,13 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Moon, Sun } from 'lucide-react'
-import { useThemeProvider } from '@/context/ThemeContext'
+
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
-  const { theme, setTheme } = useThemeProvider()
-
   return (
     <header className='border-border bg-background relative z-100 h-max w-full border-b'>
       <nav className='mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 md:py-6 lg:px-0'>
@@ -29,18 +26,6 @@ export default function Header() {
         </Link>
 
         <div className='flex w-max items-center justify-center gap-2 lg:gap-4'>
-          <Button
-            type='button'
-            variant='outline'
-            size='icon'
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className='border-border bg-secondary hover:bg-accent rounded-full'
-          >
-            <Sun className='fill-foreground stroke-foreground h-4 w-4 scale-100 transition-all dark:scale-0' />
-            <Moon className='fill-muted-foreground stroke-muted-foreground absolute h-4 w-4 scale-0 transition-all dark:scale-100' />
-            <span className='sr-only'>Toggle theme</span>
-          </Button>
-
           <Button variant='ghost' size='icon' className='h-8 w-8'>
             <a
               href='https://github.com/blueorionn/crypticworld'

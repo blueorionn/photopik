@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import PwaRegister from '@/components/PwaRegister'
-import { ThemeProvider } from '@/context/ThemeContext'
+
 import './globals.css'
 
 const geistSans = Geist({
@@ -46,13 +46,11 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className='flex min-h-full flex-col'>
-        <ThemeProvider>
-          {children}
-          <PwaRegister />
-        </ThemeProvider>
+        {children}
+        <PwaRegister />
       </body>
     </html>
   )
