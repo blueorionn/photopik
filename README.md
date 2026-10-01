@@ -1,34 +1,36 @@
-# Crypticworld
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-![CrypticWorld Logo](https://raw.githubusercontent.com/blueorionn/crypticworld/refs/heads/main/public/img/crypticworld-site-img.png)
+## Getting Started
 
-Crypticworld is a growing collection of browser-based tools for common security
-and encoding tasks. It is built with Next.js and focuses on quick, local-first
-utilities that are easy to reach from a single workspace.
+First, run the development server:
 
-## About
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-The project has been refactored into a tool-focused structure. The home page
-acts as a dashboard for available and upcoming utilities, while each tool lives
-in its own route and core module.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Current functionality centers on text hashing, with planned tools for inspecting
-tokens and encoding or decoding data. Input text is encoded with UTF-8 before
-operations are performed.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Tools
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-| Tool Name              | Description                                                                           | Status      |
-| ---------------------- | ------------------------------------------------------------------------------------- | ----------- |
-| Hash Text              | Generate hashes from text with MD5, SHA, SHA-3, Keccak-256, Blake2, Blake3, and more. | Available   |
-| JWT Decoder            | Decode and inspect JWT headers, payloads, and signatures.                             | Coming soon |
-| Base64 Encode / Decode | Convert text to and from Base64.                                                      | Coming soon |
-| URL Encode / Decode    | Percent-encode or decode strings for URLs.                                            | Coming soon |
+## Learn More
 
-## LICENSE
+To learn more about Next.js, take a look at the following resources:
 
-[Apache-2.0 license](https://github.com/blueorionn/crypticworld/blob/main/LICENSE)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Author
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-[@blueorionn](https://www.github.com/blueorionn)
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
