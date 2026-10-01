@@ -46,7 +46,7 @@ export default async function AuthErrorPage({
     <main>
       <h1>{title}</h1>
       <p>{body}</p>
-      <Link href="/auth/login">Request a new link</Link>
+      <Link href='/auth/login'>Request a new link</Link>
     </main>
   )
 }

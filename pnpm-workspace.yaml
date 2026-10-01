@@ -1,3 +1,4 @@
 allowBuilds:
+  inotify: false
   sharp: false
   unrs-resolver: false

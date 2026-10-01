@@ -58,7 +58,7 @@ export default function AuthConfirmPage() {
     if (hashError) {
       const reason = errorToReason(
         params.get('error_code') ?? hashError,
-        params.get('error_description') ?? '',
+        params.get('error_description') ?? ''
       )
       router.replace(errorRoute(reason))
       return
@@ -74,7 +74,7 @@ export default function AuthConfirmPage() {
         if (exchangeError) {
           const reason = errorToReason(
             exchangeError.code ?? null,
-            exchangeError.message,
+            exchangeError.message
           )
           router.replace(errorRoute(reason))
           return
@@ -94,7 +94,7 @@ export default function AuthConfirmPage() {
       {failed ? (
         <p>
           Something went wrong. Request a new link from the{' '}
-          <a href="/auth/login">sign-in page</a>.
+          <a href='/auth/login'>sign-in page</a>.
         </p>
       ) : (
         <p>One moment while we verify your magic link.</p>

@@ -36,14 +36,14 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        type="email"
-        placeholder="you@example.com"
+        type='email'
+        placeholder='you@example.com'
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         required
       />
 
-      <button type="submit" disabled={loading}>
+      <button type='submit' disabled={loading}>
         {loading ? 'Sending...' : 'Send magic link'}
       </button>
 
