@@ -3,7 +3,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import LogoutClient from '@/components/auth/LogoutClient'
 
 export const metadata: Metadata = {
-  title: 'Sign out · photopik',
+  title: 'Sign out - photopik',
   robots: { index: false },
 }
 

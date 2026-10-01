@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { AuthShell } from '@/components/auth/AuthShell'
 
 export const metadata: Metadata = {
-  title: 'Sign-in problem · photopik',
+  title: 'Sign-in problem - photopik',
   robots: { index: false },
 }
 

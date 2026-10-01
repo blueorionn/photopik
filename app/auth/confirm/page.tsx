@@ -3,7 +3,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import ConfirmClient from '@/components/auth/ConfirmClient'
 
 export const metadata: Metadata = {
-  title: 'Signing in · photopik',
+  title: 'Signing in - photopik',
   robots: { index: false },
 }
 

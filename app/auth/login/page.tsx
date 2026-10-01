@@ -3,7 +3,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import LoginForm from '@/components/auth/LoginForm'
 
 export const metadata: Metadata = {
-  title: 'Sign in · photopik',
+  title: 'Sign in - photopik',
   robots: { index: false },
 }
 
