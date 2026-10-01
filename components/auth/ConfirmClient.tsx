@@ -1,0 +1,121 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { Spinner } from '@/components/auth/Spinner'
+
+type Reason = 'expired' | 'used' | 'cross-device'
+
+function getHashParams(): URLSearchParams {
+  const hash = window.location.hash
+  const query = hash.startsWith('#') ? hash.slice(1) : hash
+  return new URLSearchParams(query)
+}
+
+// Maps auth errors to the reason codes understood by /auth/error.
+// Returns null for anything unrecognized -> generic error message.
+function errorToReason(code: string | null, message: string): Reason | null {
+  const text = `${code ?? ''} ${message}`.toLowerCase()
+
+  if (text.includes('code_verifier') || text.includes('bad_verification')) {
+    return 'cross-device'
+  }
+  if (text.includes('otp_expired') || text.includes('expired')) {
+    return 'expired'
+  }
+  if (text.includes('already used') || text.includes('already consumed')) {
+    return 'used'
+  }
+  return null
+}
+
+function errorRoute(reason: Reason | null): string {
+  return reason ? `/auth/error?reason=${reason}` : '/auth/error'
+}
+
+export default function ConfirmClient() {
+  const router = useRouter()
+  const started = useRef(false)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    // Guard: React StrictMode runs effects twice in dev, and the
+    // exchange code is single-use — a second attempt would always fail.
+    if (started.current) return
+    started.current = true
+
+    const params = getHashParams()
+    const hashError = params.get('error')
+    const code = params.get('code')
+
+    // Landed here without either param (e.g. URL typed by hand).
+    if (!hashError && !code) {
+      router.replace('/auth/error')
+      return
+    }
+
+    // Supabase redirected back with a failure (expired/invalid link).
+    if (hashError) {
+      const reason = errorToReason(
+        params.get('error_code') ?? hashError,
+        params.get('error_description') ?? ''
+      )
+      router.replace(errorRoute(reason))
+      return
+    }
+
+    // The happy path: exchange the code (the library parses the hash
+    // itself, including the PKCE verifier cookie it shares storage with).
+    const supabase = createClient()
+
+    supabase.auth
+      .exchangeCodeForSession(window.location.hash)
+      .then(({ error: exchangeError }) => {
+        if (exchangeError) {
+          const reason = errorToReason(
+            exchangeError.code ?? null,
+            exchangeError.message
+          )
+          router.replace(errorRoute(reason))
+          return
+        }
+
+        // Scrub the token from the address bar so it never lands
+        // in browser history, then navigate without a history entry.
+        window.history.replaceState(null, '', window.location.pathname)
+        router.replace('/dashboard')
+      })
+      .catch(() => setFailed(true))
+  }, [router])
+
+  if (failed) {
+    return (
+      <div className='flex flex-col items-center text-center'>
+        <p className='font-medium text-zinc-900 dark:text-zinc-50'>
+          We couldn&apos;t verify this link
+        </p>
+        <p className='mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400'>
+          Something unexpected went wrong on our side. Requesting a fresh link
+          usually fixes it.
+        </p>
+        <Link
+          href='/auth/login'
+          className='mt-6 flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+        >
+          Back to sign in
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className='flex flex-col items-center text-center'>
+      <Spinner className='size-10 text-zinc-400 dark:text-zinc-500' />
+      <p className='mt-4 text-sm text-zinc-500 dark:text-zinc-400'>
+        Verifying your magic link…
+      </p>
+    </div>
+  )
+}

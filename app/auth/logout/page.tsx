@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
 import { AuthShell } from '@/components/auth/AuthShell'
-import LoginForm from '@/components/auth/LoginForm'
+import LogoutClient from '@/components/auth/LogoutClient'
 
 export const metadata: Metadata = {
-  title: 'Sign in · photopik',
+  title: 'Sign out · photopik',
   robots: { index: false },
 }
 
-export default function LoginPage() {
+export default function LogoutPage() {
   return (
-    <AuthShell title='Sign in' description=''>
-      <LoginForm />
+    <AuthShell title='Sign out'>
+      <LogoutClient />
     </AuthShell>
   )
 }
