@@ -17,14 +17,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 const STORAGE_KEY = 'theme'
 
 function getServerSnapshot(): 'light' | 'dark' {
-  return 'dark'
+  return 'light'
 }
 
 function getTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') return getServerSnapshot()
   const stored = window.localStorage.getItem(STORAGE_KEY)
   if (stored === 'light' || stored === 'dark') return stored
-  return 'dark'
+  return 'light'
 }
 
 function subscribeToTheme(callback: () => void): () => void {
