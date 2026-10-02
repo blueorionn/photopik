@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Spinner } from '@/components/auth/Spinner'
+import { Spinner } from '@/components/Spinner'
 
 export const metadata: Metadata = {
   title: 'photopik',
@@ -39,9 +39,9 @@ const PHOTOS: Photo[] = [
 
 function PhotoCard({ aspect, fill }: Photo) {
   return (
-    <div className='group relative mb-4 break-inside-avoid overflow-hidden rounded-xl border border-border'>
+    <div className='group border-border relative mb-4 break-inside-avoid overflow-hidden rounded-xl border'>
       <div
-        className={`w-full bg-surface bg-linear-to-br ${fill} to-transparent transition-transform duration-300 group-hover:scale-[1.03] ${aspect}`}
+        className={`bg-surface w-full bg-linear-to-br ${fill} to-transparent transition-transform duration-300 group-hover:scale-[1.03] ${aspect}`}
       />
     </div>
   )
@@ -50,7 +50,7 @@ function PhotoCard({ aspect, fill }: Photo) {
 export default function Home() {
   return (
     <div className='font-sans'>
-      <header className='sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur'>
+      <header className='border-border bg-background/80 sticky top-0 z-10 border-b backdrop-blur'>
         <div className='mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6'>
           <Link href='/' className='flex shrink-0 items-center gap-2'>
             <Image
@@ -61,7 +61,7 @@ export default function Home() {
               priority
               className='size-8'
             />
-            <span className='text-base font-semibold tracking-tight text-foreground'>
+            <span className='text-foreground text-base font-semibold tracking-tight'>
               photopik<span className='text-accent'>.</span>
             </span>
           </Link>
@@ -71,12 +71,12 @@ export default function Home() {
             type='search'
             placeholder='Search photos…'
             aria-label='Search photos'
-            className='mx-auto hidden w-full max-w-md rounded-lg border border-border bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted/70 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 sm:block'
+            className='border-border bg-surface text-foreground placeholder:text-muted/70 focus:border-accent focus:ring-accent/30 mx-auto hidden w-full max-w-md rounded-lg border px-4 py-2 text-sm transition-colors focus:ring-2 focus:outline-none sm:block'
           />
 
           <Link
             href='/auth/login'
-            className='shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover'
+            className='bg-accent text-accent-foreground hover:bg-accent-hover shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-colors'
           >
             Sign in
           </Link>
@@ -90,7 +90,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className='flex items-center justify-center gap-2 py-10 text-muted'>
+        <div className='text-muted flex items-center justify-center gap-2 py-10'>
           <Spinner />
           <span className='text-sm'>Loading more…</span>
         </div>

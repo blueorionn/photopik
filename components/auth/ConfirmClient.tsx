@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Spinner } from '@/components/auth/Spinner'
+import { Spinner } from '@/components/Spinner'
 
 type Reason = 'expired' | 'used' | 'cross-device'
 

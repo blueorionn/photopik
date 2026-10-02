@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Spinner } from '@/components/auth/Spinner'
+import { Spinner } from '@/components/Spinner'
 
 type Status = 'idle' | 'sending' | 'sent'
 

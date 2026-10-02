@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Spinner } from '@/components/auth/Spinner'
+import { Spinner } from '@/components/Spinner'
 
 type Status = 'signing-out' | 'done' | 'failed'
 
