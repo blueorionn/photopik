@@ -8,7 +8,7 @@ type Status = 'idle' | 'sending' | 'sent'
 
 function CheckIcon() {
   return (
-    <span className='flex size-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'>
+    <span className='bg-accent/10 text-accent flex size-10 items-center justify-center rounded-full'>
       <svg viewBox='0 0 24 24' fill='none' className='size-5' aria-hidden>
         <path
           d='m5 13 4 4L19 7'
@@ -62,10 +62,8 @@ export default function LoginForm() {
         className='animate-fade-up flex flex-col items-center text-center motion-reduce:animate-none'
       >
         <CheckIcon />
-        <p className='mt-4 font-medium text-zinc-900 dark:text-zinc-50'>
-          Check your inbox
-        </p>
-        <p className='mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400'>
+        <p className='text-foreground mt-4 font-medium'>Check your inbox</p>
+        <p className='text-muted mt-1.5 text-sm leading-relaxed'>
           We sent a sign-in link to <strong>{email}</strong>. It works once,
           expires soon, and must be opened in this browser.
         </p>
@@ -75,7 +73,7 @@ export default function LoginForm() {
             setStatus('idle')
             setError(null)
           }}
-          className='mt-6 text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300'
+          className='text-accent hover:text-accent-hover mt-6 text-sm font-medium transition-colors'
         >
           Use a different email
         </button>
@@ -87,7 +85,7 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} noValidate={false}>
       <label
         htmlFor='email'
-        className='block text-sm font-medium text-zinc-700 dark:text-zinc-300'
+        className='text-foreground block text-sm font-medium'
       >
         Email address
       </label>
@@ -102,11 +100,11 @@ export default function LoginForm() {
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         disabled={status === 'sending'}
-        className='mt-2 w-full rounded-lg border border-zinc-300 bg-transparent px-3.5 py-2.5 text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-50 dark:placeholder:text-zinc-600 dark:focus:border-indigo-400'
+        className='border-border text-foreground placeholder:text-muted/60 focus:border-accent focus:ring-accent/30 mt-2 w-full rounded-lg border bg-transparent px-3.5 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-60'
       />
 
       {error ? (
-        <p role='alert' className='mt-2 text-sm text-red-600 dark:text-red-400'>
+        <p role='alert' className='mt-2 text-sm text-red-500'>
           {error}
         </p>
       ) : null}
@@ -114,7 +112,7 @@ export default function LoginForm() {
       <button
         type='submit'
         disabled={status === 'sending'}
-        className='mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-700 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+        className='bg-accent text-accent-foreground hover:bg-accent-hover mt-5 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60'
       >
         {status === 'sending' ? (
           <>
@@ -126,7 +124,7 @@ export default function LoginForm() {
         )}
       </button>
 
-      <p className='mt-6 text-center text-xs leading-relaxed text-zinc-400 dark:text-zinc-600'>
+      <p className='text-foreground/80 mt-6 text-center text-xs leading-relaxed'>
         New here? Your account is created automatically the first time you sign
         in.
       </p>

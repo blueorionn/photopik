@@ -28,10 +28,8 @@ export default function LogoutClient() {
   if (status === 'signing-out') {
     return (
       <div className='flex flex-col items-center text-center'>
-        <Spinner className='size-10 text-zinc-400 dark:text-zinc-500' />
-        <p className='mt-4 text-sm text-zinc-500 dark:text-zinc-400'>
-          Signing you out…
-        </p>
+        <Spinner className='text-muted size-10' />
+        <p className='text-muted mt-4 text-sm'>Signing you out…</p>
       </div>
     )
   }
@@ -39,16 +37,16 @@ export default function LogoutClient() {
   if (status === 'failed') {
     return (
       <div className='animate-fade-up flex flex-col items-center text-center motion-reduce:animate-none'>
-        <p className='font-medium text-zinc-900 dark:text-zinc-50'>
+        <p className='text-foreground font-medium'>
           Couldn&apos;t sign you out
         </p>
-        <p className='mt-1.5 text-sm text-zinc-500 dark:text-zinc-400'>
+        <p className='text-muted mt-1.5 text-sm'>
           Check your connection and try again.
         </p>
         <button
           type='button'
           onClick={() => window.location.reload()}
-          className='mt-6 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+          className='bg-accent text-accent-foreground hover:bg-accent-hover mt-6 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors'
         >
           Try again
         </button>
@@ -58,7 +56,7 @@ export default function LogoutClient() {
 
   return (
     <div className='animate-fade-up flex flex-col items-center text-center motion-reduce:animate-none'>
-      <span className='flex size-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'>
+      <span className='bg-accent/10 text-accent flex size-10 items-center justify-center rounded-full'>
         <svg viewBox='0 0 24 24' fill='none' className='size-5' aria-hidden>
           <path
             d='m5 13 4 4L19 7'
@@ -69,15 +67,11 @@ export default function LogoutClient() {
           />
         </svg>
       </span>
-      <p className='mt-4 font-medium text-zinc-900 dark:text-zinc-50'>
-        You&apos;re signed out
-      </p>
-      <p className='mt-1.5 text-sm text-zinc-500 dark:text-zinc-400'>
-        See you soon.
-      </p>
+      <p className='text-foreground mt-4 font-medium'>You&apos;re signed out</p>
+      <p className='text-muted mt-1.5 text-sm'>See you soon.</p>
       <Link
         href='/auth/login'
-        className='mt-6 flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+        className='bg-accent text-accent-foreground hover:bg-accent-hover mt-6 flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors'
       >
         Sign in again
       </Link>

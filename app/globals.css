@@ -1,22 +1,51 @@
 @import 'tailwindcss';
 
+/*
+ * Theme: dark is the DEFAULT (also when the system has no preference).
+ * Light applies only when the system explicitly prefers light.
+ * Accent is #029F80 in both modes.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --background: #0c1211;
+  --foreground: #edf5f2;
+  --muted: #8fa5a0;
+  --border: #22302c;
+  --surface: #121a18;
+
+  --accent: #029f80;
+  --accent-hover: #1cb394;
+  --accent-foreground: #ffffff;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --background: #ffffff;
+    --foreground: #0e1714;
+    --muted: #5c6d68;
+    --border: #e2ebe8;
+    --surface: #f5f9f8;
+
+    --accent: #029f80;
+    --accent-hover: #01806a;
+    --accent-foreground: #ffffff;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

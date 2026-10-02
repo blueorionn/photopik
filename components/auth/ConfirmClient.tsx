@@ -93,16 +93,16 @@ export default function ConfirmClient() {
   if (failed) {
     return (
       <div className='flex flex-col items-center text-center'>
-        <p className='font-medium text-zinc-900 dark:text-zinc-50'>
+        <p className='text-foreground font-medium'>
           We couldn&apos;t verify this link
         </p>
-        <p className='mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400'>
+        <p className='text-muted mt-1.5 text-sm leading-relaxed'>
           Something unexpected went wrong on our side. Requesting a fresh link
           usually fixes it.
         </p>
         <Link
           href='/auth/login'
-          className='mt-6 flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+          className='bg-accent text-accent-foreground hover:bg-accent-hover mt-6 flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors'
         >
           Back to sign in
         </Link>
@@ -112,10 +112,8 @@ export default function ConfirmClient() {
 
   return (
     <div className='flex flex-col items-center text-center'>
-      <Spinner className='size-10 text-zinc-400 dark:text-zinc-500' />
-      <p className='mt-4 text-sm text-zinc-500 dark:text-zinc-400'>
-        Verifying your magic link…
-      </p>
+      <Spinner className='text-muted size-10' />
+      <p className='text-muted mt-4 text-sm'>Verifying your magic link…</p>
     </div>
   )
 }

@@ -115,13 +115,13 @@ const REASONS: Record<Reason, ReasonConfig> = {
     title: 'This link has expired',
     body: 'Magic links are short-lived by design. Request a fresh one and it should work.',
     icon: <ClockIcon />,
-    tone: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    tone: 'bg-amber-500/10 text-amber-500',
   },
   used: {
     title: 'This link was already used',
     body: 'Each magic link works exactly once. Request a fresh link to sign in.',
     icon: <RefreshIcon />,
-    tone: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    tone: 'bg-accent/10 text-accent',
   },
   'cross-device': {
     title: 'Different browser detected',
@@ -129,7 +129,7 @@ const REASONS: Record<Reason, ReasonConfig> = {
       'You opened this link in a different browser than the one you requested it from. ' +
       'Open it in the original browser (same profile, not a private window).',
     icon: <DevicesIcon />,
-    tone: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+    tone: 'bg-sky-500/10 text-sky-500',
   },
 }
 
@@ -137,7 +137,7 @@ const FALLBACK: ReasonConfig = {
   title: 'Something went wrong',
   body: 'We could not sign you in with this link. Please request a new one.',
   icon: <AlertIcon />,
-  tone: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  tone: 'bg-red-500/10 text-red-500',
 }
 
 // Only reason codes from the fixed whitelist are honored; anything
@@ -169,7 +169,7 @@ export default async function AuthErrorPage({
     >
       <Link
         href='/auth/login'
-        className='flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300'
+        className='bg-accent text-accent-foreground hover:bg-accent-hover flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors'
       >
         Request a new link
       </Link>
