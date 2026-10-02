@@ -50,13 +50,11 @@ export default function ConfirmClient() {
     const hashError = params.get('error')
     const code = params.get('code')
 
-    // Landed here without either param (e.g. URL typed by hand).
     if (!hashError && !code) {
       router.replace('/auth/error')
       return
     }
 
-    // Supabase redirected back with a failure (expired/invalid link).
     if (hashError) {
       const reason = errorToReason(
         params.get('error_code') ?? hashError,
@@ -85,7 +83,7 @@ export default function ConfirmClient() {
         // Scrub the token from the address bar so it never lands
         // in browser history, then navigate without a history entry.
         window.history.replaceState(null, '', window.location.pathname)
-        router.replace('/dashboard')
+        router.replace('/')
       })
       .catch(() => setFailed(true))
   }, [router])
