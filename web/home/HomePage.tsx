@@ -21,7 +21,7 @@ export default async function HomePage() {
   const photos = await getPublicFeed(20)
 
   return (
-    <main className='mx-auto max-w-7xl px-4 py-6 sm:px-6'>
+    <main className='mx-auto max-w-7xl px-4 pt-6 pb-24 sm:px-6 sm:pb-6'>
       {photos.length === 0 ? (
         <div className='text-muted flex flex-col items-center gap-2 py-24 text-center'>
           <p className='text-sm'>Nothing to see yet — the gallery is empty.</p>
