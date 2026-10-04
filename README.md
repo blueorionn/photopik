@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# photopik
 
-## Getting Started
+A quiet home for your photos — a curated photo gallery built on Next.js, Supabase, and CloudFront.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Philosophy
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Three decisions shape everything in this repository. Read them before contributing.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**1. Row Level Security is the security model, not a layer under the API.**
+The deployed app holds no privileged database credential. Browser and server code query through `supabase-js` with the caller's identity (`anon` for visitors, `authenticated` for users), and Postgres RLS policies decide what exists for each request. A bug in application code cannot leak another user's data — the database refuses. The full-power Postgres connection exists **only** for running migrations, on a developer machine or CI. It is never deployed.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**2. An API exists only where privilege physically requires one.**
+Presigned S3 uploads, CloudFront URL/cookie signing, role administration — these cannot run in a browser and will live in narrowly-scoped route handlers. Everything else (feeds, collections, mutes, edits) talks to Postgres directly under RLS. Fewer doors; each one deliberate.
 
-## Learn More
+**3. The PWA is installable but deliberately does not work offline.**
+The service worker (Serwist/Turbopack) precaches only build assets and an offline fallback page. Navigations are network-only: no stale pages, no cached gallery, nothing user-specific ever in the service worker cache.
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 16 (App Router, `proxy.ts`, React Compiler) |
+| Auth | Supabase magic link (no passwords), PKCE; TOTP MFA required for staff roles *(planned)* |
+| Database | Supabase Postgres — schema owned by Drizzle migrations |
+| Data access | `supabase-js` under RLS (see Philosophy) |
+| Media | S3 + CloudFront; database stores object keys, never URLs |
+| UI | Tailwind CSS v4 + shadcn/ui; light default, dark via class, `#029F80` accent |
+| Hosting | Vercel |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Visibility model
 
-## Deploy on Vercel
+- `photos.is_private` — owner-only vs. public. Enforced by **RLS**.
+- `photos.is_nsfw` — content rating. Filtered by the viewer's preference *(preferences table planned)*.
+- `hidden_photos` — per-user "never show me this". Enforced by the feed query; strictly own-rows under RLS.
+- `collections` — public/private shelves; `collection_photos` visibility **composes**: a row is visible only when both the collection *and* the photo are visible to the viewer (postgres does this; see the policies in the migration).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[Apache 2.0](./LICENSE)
