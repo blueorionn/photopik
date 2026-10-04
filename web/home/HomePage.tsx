@@ -4,13 +4,13 @@ import { cdnUrl, getPublicFeed, type FeedPhoto } from '@/lib/db/queries'
 
 function PhotoCard({ photo }: { photo: FeedPhoto }) {
   return (
-    <div className='group border-border relative mb-4 break-inside-avoid overflow-hidden rounded-xl border'>
+    <div className='group border-border relative mb-4 break-inside-avoid overflow-hidden rounded border'>
       <Image
         src={cdnUrl(photo.storage_key)}
         alt={photo.name}
         width={photo.width}
         height={photo.height}
-        sizes='(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
+        sizes='(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
         className='h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
       />
     </div>
@@ -27,7 +27,7 @@ export default async function HomePage() {
           <p className='text-sm'>Nothing to see yet — the gallery is empty.</p>
         </div>
       ) : (
-        <div className='columns-2 gap-4 sm:columns-3 lg:columns-4 xl:columns-5'>
+        <div className='columns-2 gap-4 lg:columns-3'>
           {photos.map((photo) => (
             <PhotoCard key={photo.id} photo={photo} />
           ))}
