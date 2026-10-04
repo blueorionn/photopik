@@ -2,9 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Bell, CirclePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useThemeProvider } from '@/context/ThemeContext'
+
+// shared look for the header icon buttons — hairline box, muted glyph
+const ICON_BUTTON_CLASS =
+  'border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer'
 
 export default function Header() {
   const { theme, setTheme } = useThemeProvider()
@@ -35,18 +39,42 @@ export default function Header() {
             className='border-border bg-surface text-foreground placeholder:text-muted/70 focus:border-accent focus:ring-accent/30 mx-auto hidden w-full max-w-md rounded-lg border px-4 py-2 text-sm transition-colors focus:ring-2 focus:outline-none sm:block'
           />
 
-          <div className='flex w-max items-center justify-center'>
+          <div className='flex w-max items-center justify-center gap-2'>
+            {/* stubs — wired up when notifications and upload exist */}
+            <Button
+              variant='ghost'
+              size='icon'
+              aria-label='Notifications'
+              className={ICON_BUTTON_CLASS}
+            >
+              <Bell className='size-4' />
+            </Button>
+            <Button
+              variant='ghost'
+              size='icon'
+              aria-label='Upload photo'
+              className={ICON_BUTTON_CLASS}
+            >
+              <CirclePlus className='size-4' />
+            </Button>
+
+            {/* soft divider between app actions and the account cluster */}
+            <div
+              aria-hidden
+              className='bg-foreground/20 dark:bg-foreground/30 mx-1 h-5 w-px shrink-0'
+            />
+
             <Button
               variant='ghost'
               size='icon'
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className='cursor-pointer'
+              className={ICON_BUTTON_CLASS}
             >
               {theme === 'dark' ? (
-                <Sun className='size-5' />
+                <Sun className='size-4' />
               ) : (
-                <Moon className='size-5' />
+                <Moon className='size-4' />
               )}
             </Button>
             <Link
