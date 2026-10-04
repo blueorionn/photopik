@@ -30,16 +30,19 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* search stub — wired up when the media API exists */}
-        <input
-          type='search'
-          placeholder='Search photos…'
-          aria-label='Search photos'
-          className='border-border bg-surface text-foreground placeholder:text-muted/70 focus:border-accent focus:ring-accent/30 mx-auto hidden w-full max-w-md rounded-lg border px-4 py-2 text-sm transition-colors focus:ring-2 focus:outline-none sm:block'
-        />
-
-        <div className='ml-auto flex w-max items-center justify-center gap-2 sm:ml-0'>
+        <div className='ml-auto flex w-max items-center justify-center gap-2'>
           <div className='hidden items-center gap-2 sm:flex'>
+            <Button
+              asChild
+              variant='ghost'
+              size='icon'
+              className={ICON_BUTTON_CLASS}
+            >
+              <Link href='/search' aria-label='Search photos'>
+                <Search className='size-4' />
+              </Link>
+            </Button>
+
             {/* stubs — wired up when notifications and upload exist */}
             <Button
               variant='ghost'
@@ -65,15 +68,17 @@ export default function Header() {
             />
           </div>
 
-          {/* mobile: search icon and divider — desktop uses the search input above */}
+          {/* mobile: search link and divider */}
           <div className='flex items-center gap-2 sm:hidden'>
             <Button
+              asChild
               variant='ghost'
               size='icon'
-              aria-label='Search photos'
               className={ICON_BUTTON_CLASS}
             >
-              <Search className='size-4' />
+              <Link href='/search' aria-label='Search photos'>
+                <Search className='size-4' />
+              </Link>
             </Button>
             <div
               aria-hidden
