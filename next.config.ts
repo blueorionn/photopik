@@ -1,3 +1,4 @@
+import { withSerwist } from '@serwist/turbopack'
 import type { NextConfig } from 'next'
 
 const CDN_HOST = new URL(process.env.CDN_HOST!).hostname
@@ -10,4 +11,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withSerwist(nextConfig)
