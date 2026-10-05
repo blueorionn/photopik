@@ -81,6 +81,7 @@ export default function LoginForm() {
           onClick={() => {
             setStatus('idle')
             setError(null)
+            setCaptchaToken(undefined)
           }}
           className='text-accent hover:text-accent-hover mt-6 text-sm font-medium transition-colors'
         >
@@ -124,6 +125,11 @@ export default function LoginForm() {
         onSuccess={setCaptchaToken}
         onExpire={() => setCaptchaToken(undefined)}
         options={{ theme: 'auto', size: 'flexible' }}
+        onError={(errorCode) => {
+          setCaptchaToken(undefined)
+          console.error('Turnstile challenge failed:', errorCode)
+          setError('Verification failed. Refresh the page and try again.')
+        }}
       />
 
       <button
