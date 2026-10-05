@@ -12,7 +12,9 @@ export type FeedPhoto = {
   upload_time: string
 }
 
-export async function getPublicFeed(limit = 20): Promise<FeedPhoto[]> {
+export const MAX_PER_PAGE_LIMIT = 25
+
+export async function getPublicFeed(limit = MAX_PER_PAGE_LIMIT): Promise<FeedPhoto[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
