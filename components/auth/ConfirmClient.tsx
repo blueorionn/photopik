@@ -8,18 +8,28 @@ import { Spinner } from '@/components/Spinner'
 
 type Reason = 'expired' | 'used' | 'cross-device'
 
-function getHashParams(): URLSearchParams {
-  const hash = window.location.hash
-  const query = hash.startsWith('#') ? hash.slice(1) : hash
-  return new URLSearchParams(query)
+// PKCE magic links put `code` (or `error`) in the QUERY string;
+// OAuth-style flows may use the hash. Read both — query wins,
+// matching @supabase/auth-js's own precedence.
+function getRedirectParams(): URLSearchParams {
+  const params = new URLSearchParams(window.location.search)
+  const hash = window.location.hash.startsWith('#')
+    ? window.location.hash.slice(1)
+    : window.location.hash
+  new URLSearchParams(hash).forEach((value, key) => {
+    if (!params.has(key)) params.set(key, value)
+  })
+  return params
 }
 
-// Maps auth errors to the reason codes understood by /auth/error.
-// Returns null for anything unrecognized -> generic error message.
 function errorToReason(code: string | null, message: string): Reason | null {
   const text = `${code ?? ''} ${message}`.toLowerCase()
 
-  if (text.includes('code_verifier') || text.includes('bad_verification')) {
+  if (
+    text.includes('code_verifier') ||
+    text.includes('code verifier') ||
+    text.includes('bad_verification')
+  ) {
     return 'cross-device'
   }
   if (text.includes('otp_expired') || text.includes('expired')) {
@@ -46,30 +56,30 @@ export default function ConfirmClient() {
     if (started.current) return
     started.current = true
 
-    const params = getHashParams()
-    const hashError = params.get('error')
+    const params = getRedirectParams()
+    const redirectError = params.get('error')
     const code = params.get('code')
 
-    if (!hashError && !code) {
+    // Landed here without code or error (e.g. URL typed by hand).
+    if (!redirectError && !code) {
       router.replace('/auth/error')
       return
     }
 
-    if (hashError) {
+    if (redirectError) {
       const reason = errorToReason(
-        params.get('error_code') ?? hashError,
+        params.get('error_code') ?? redirectError,
         params.get('error_description') ?? ''
       )
       router.replace(errorRoute(reason))
       return
     }
 
-    // The happy path: exchange the code (the library parses the hash
-    // itself, including the PKCE verifier cookie it shares storage with).
     const supabase = createClient()
+    const flowId = params.get('sb_flow_id')
 
     supabase.auth
-      .exchangeCodeForSession(window.location.hash)
+      .exchangeCodeForSession(code!, flowId ? { flowId } : undefined)
       .then(({ error: exchangeError }) => {
         if (exchangeError) {
           const reason = errorToReason(
@@ -80,7 +90,7 @@ export default function ConfirmClient() {
           return
         }
 
-        // Scrub the token from the address bar so it never lands
+        // Scrub code/error from the address bar so they never land
         // in browser history, then navigate without a history entry.
         window.history.replaceState(null, '', window.location.pathname)
         router.replace('/')
