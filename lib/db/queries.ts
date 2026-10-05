@@ -14,7 +14,9 @@ export type FeedPhoto = {
 
 export const MAX_PER_PAGE_LIMIT = 25
 
-export async function getPublicFeed(limit = MAX_PER_PAGE_LIMIT): Promise<FeedPhoto[]> {
+export async function getPublicFeed(
+  limit = MAX_PER_PAGE_LIMIT
+): Promise<FeedPhoto[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
