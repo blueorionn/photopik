@@ -1,6 +1,7 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { createClient } from '@/lib/supabase/client'
 import { Spinner } from '@/components/Spinner'
 
@@ -24,12 +25,20 @@ function CheckIcon() {
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
+
+  const turnstileRef = useRef<TurnstileInstance>(null)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (status === 'sending') return
+
+    if (!captchaToken) {
+      setError('Please complete the verification challenge.')
+      return
+    }
 
     setStatus('sending')
     setError(null)
@@ -40,12 +49,12 @@ export default function LoginForm() {
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        captchaToken,
       },
     })
 
     if (error) {
-      // Details stay in the console; users get a generic message
-      // (prevents leaking server-side details to the browser).
+      turnstileRef.current?.reset()
       console.error('Magic link request failed:', error.message)
       setError('That did not work. Check the address and try again shortly.')
       setStatus('idle')
@@ -100,7 +109,7 @@ export default function LoginForm() {
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         disabled={status === 'sending'}
-        className='border-border text-foreground placeholder:text-muted/60 focus:border-accent focus:ring-accent/30 mt-2 w-full rounded-lg border bg-transparent px-3.5 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-60'
+        className='border-border text-foreground placeholder:text-muted/60 focus:border-accent focus:ring-accent/30 my-2 w-full rounded-lg border bg-transparent px-3.5 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-60'
       />
 
       {error ? (
@@ -108,6 +117,14 @@ export default function LoginForm() {
           {error}
         </p>
       ) : null}
+
+      <Turnstile
+        ref={turnstileRef}
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        onSuccess={setCaptchaToken}
+        onExpire={() => setCaptchaToken(undefined)}
+        options={{ theme: 'auto', size: 'flexible' }}
+      />
 
       <button
         type='submit'

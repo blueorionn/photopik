@@ -19,22 +19,22 @@ The service worker (Serwist/Turbopack) precaches only build assets and an offlin
 
 ## Architecture
 
-| Layer | Choice |
-| --- | --- |
-| Framework | Next.js 16 (App Router, `proxy.ts`, React Compiler) |
-| Auth | Supabase magic link (no passwords), PKCE; TOTP MFA required for staff roles *(planned)* |
-| Database | Supabase Postgres — schema owned by Drizzle migrations |
-| Data access | `supabase-js` under RLS (see Philosophy) |
-| Media | S3 + CloudFront; database stores object keys, never URLs |
-| UI | Tailwind CSS v4 + shadcn/ui; light default, dark via class, `#029F80` accent |
-| Hosting | Vercel |
+| Layer       | Choice                                                                                  |
+| ----------- | --------------------------------------------------------------------------------------- |
+| Framework   | Next.js 16                                                                              |
+| Auth        | Supabase magic link (no passwords), PKCE; TOTP MFA required for staff roles _(planned)_ |
+| Database    | Supabase Postgres — schema owned by Drizzle migrations                                  |
+| Data access | `supabase-js` under RLS (see Philosophy)                                                |
+| Media       | S3 + CloudFront                                                                         |
+| UI          | Tailwind CSS v4 + shadcn/ui                                                             |
+| Hosting     | Vercel                                                                                  |
 
 ### Visibility model
 
 - `photos.is_private` — owner-only vs. public. Enforced by **RLS**.
-- `photos.is_nsfw` — content rating. Filtered by the viewer's preference *(preferences table planned)*.
+- `photos.is_nsfw` — content rating. Filtered by the viewer's preference _(preferences table planned)_.
 - `hidden_photos` — per-user "never show me this". Enforced by the feed query; strictly own-rows under RLS.
-- `collections` — public/private shelves; `collection_photos` visibility **composes**: a row is visible only when both the collection *and* the photo are visible to the viewer (postgres does this; see the policies in the migration).
+- `collections` — public/private shelves; `collection_photos` visibility **composes**: a row is visible only when both the collection _and_ the photo are visible to the viewer (postgres does this; see the policies in the migration).
 
 ## License
 
