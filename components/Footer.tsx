@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Bell, CirclePlus, House } from 'lucide-react'
+import { CirclePlus, GalleryVertical, House } from 'lucide-react'
 
 // mobile bottom-nav items — plain, borderless, thumb-sized
 const NAV_ITEM_CLASS =
@@ -22,13 +22,13 @@ export default function Footer() {
         >
           <CirclePlus className='size-5' />
         </button>
-        <button
-          type='button'
-          aria-label='Notifications'
+        <Link
+          href='/scroll'
+          aria-label='Scroll mode'
           className={NAV_ITEM_CLASS}
         >
-          <Bell className='size-5' />
-        </button>
+          <GalleryVertical className='size-5' />
+        </Link>
       </div>
     </nav>
   )

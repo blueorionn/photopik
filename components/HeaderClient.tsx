@@ -87,7 +87,7 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
             />
           </div>
 
-          {/* mobile: search link and divider */}
+          {/* mobile: search, notifications and divider */}
           <div className='flex items-center gap-2 sm:hidden'>
             <Button
               asChild
@@ -99,15 +99,14 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
                 <Search className='size-4' />
               </Link>
             </Button>
+            {/* stub — wired up when notifications exist */}
             <Button
-              asChild
               variant='ghost'
               size='icon'
+              aria-label='Notifications'
               className={ICON_BUTTON_CLASS}
             >
-              <Link href='/scroll' aria-label='Scroll mode'>
-                <GalleryVertical className='size-4' />
-              </Link>
+              <Bell className='size-4' />
             </Button>
             <div
               aria-hidden
