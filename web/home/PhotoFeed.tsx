@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Spinner } from '@/components/Spinner'
 import { createClient } from '@/lib/supabase/client'
@@ -10,6 +10,50 @@ import type { FeedPhoto } from '@/lib/db/queries'
 // renders the first page with the same size.
 const PAGE_SIZE = 25
 
+const DESKTOP_QUERY = '(min-width: 1024px)'
+
+function useColumnCount(): number {
+  const [count, setCount] = useState(2)
+
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY)
+    const update = () => setCount(mq.matches ? 3 : 2)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  return count
+}
+
+/**
+ * Greedy shortest-column placement, using each photo's aspect ratio as a
+ * height proxy (every column has the same width, so aspect ~ rendered height).
+ *
+ * The algorithm is prefix-stable: an item's column depends only on the items
+ * before it. Appending a new page therefore never moves existing photos —
+ * new items only extend the bottom of the shortest column. A full reflow
+ * happens only when the column count changes (breakpoint crossing), which is
+ * expected. This is why we don't use CSS columns: the browser rebalances the
+ * whole container on every insertion and reshuffles everything above the
+ * fold.
+ */
+function distribute(photos: FeedPhoto[], count: number): FeedPhoto[][] {
+  const columns: FeedPhoto[][] = Array.from({ length: count }, () => [])
+  const heights = new Array<number>(count).fill(0)
+
+  for (const photo of photos) {
+    let shortest = 0
+    for (let i = 1; i < count; i++) {
+      if (heights[i] < heights[shortest]) shortest = i
+    }
+    columns[shortest].push(photo)
+    heights[shortest] += photo.height / photo.width
+  }
+
+  return columns
+}
+
 function PhotoCard({
   photo,
   cdnPrefix,
@@ -18,13 +62,13 @@ function PhotoCard({
   cdnPrefix: string
 }) {
   return (
-    <div className='group border-border relative mb-4 break-inside-avoid overflow-hidden rounded border'>
+    <div className='group border-border relative mb-4 overflow-hidden rounded border'>
       <Image
         src={`${cdnPrefix}${photo.storage_key}`}
         alt={photo.name}
         width={photo.width}
         height={photo.height}
-        sizes='(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
+        sizes='(min-width: 1024px) 33vw, 50vw'
         className='h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
       />
     </div>
@@ -47,6 +91,12 @@ export default function PhotoFeed({
   // Total rows requested so far — the offset for the next page.
   const offsetRef = useRef(initialPhotos.length)
   const loadingRef = useRef(false)
+
+  const columnCount = useColumnCount()
+  const columns = useMemo(
+    () => distribute(photos, columnCount),
+    [photos, columnCount]
+  )
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return
@@ -114,9 +164,13 @@ export default function PhotoFeed({
 
   return (
     <>
-      <div className='columns-2 gap-4 lg:columns-3'>
-        {photos.map((photo) => (
-          <PhotoCard key={photo.id} photo={photo} cdnPrefix={cdnPrefix} />
+      <div className='flex items-start gap-4'>
+        {columns.map((column, i) => (
+          <div key={i} className='min-w-0 flex-1'>
+            {column.map((photo) => (
+              <PhotoCard key={photo.id} photo={photo} cdnPrefix={cdnPrefix} />
+            ))}
+          </div>
         ))}
       </div>
 
