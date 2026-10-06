@@ -2,7 +2,15 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Sun, Moon, Bell, CirclePlus, Search, User } from 'lucide-react'
+import {
+  Sun,
+  Moon,
+  Bell,
+  CirclePlus,
+  Search,
+  User,
+  GalleryVertical,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useThemeProvider } from '@/context/ThemeContext'
 
@@ -43,6 +51,17 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
               </Link>
             </Button>
 
+            <Button
+              asChild
+              variant='ghost'
+              size='icon'
+              className={ICON_BUTTON_CLASS}
+            >
+              <Link href='/scroll' aria-label='Scroll mode'>
+                <GalleryVertical className='size-4' />
+              </Link>
+            </Button>
+
             {/* stubs — wired up when notifications and upload exist */}
             <Button
               variant='ghost'
@@ -78,6 +97,16 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
             >
               <Link href='/search' aria-label='Search photos'>
                 <Search className='size-4' />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant='ghost'
+              size='icon'
+              className={ICON_BUTTON_CLASS}
+            >
+              <Link href='/scroll' aria-label='Scroll mode'>
+                <GalleryVertical className='size-4' />
               </Link>
             </Button>
             <div
