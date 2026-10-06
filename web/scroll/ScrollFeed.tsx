@@ -124,7 +124,7 @@ export default function ScrollFeed({
 
             <div
               aria-hidden
-              className='pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-20'
+              className='pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 to-transparent p-4 pt-20'
             >
               <p className='text-sm text-white/90'>{photo.name}</p>
             </div>
