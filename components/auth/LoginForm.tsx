@@ -3,6 +3,7 @@
 import { FormEvent, useRef, useState } from 'react'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { createClient } from '@/lib/supabase/client'
+import { safeRedirectPath } from '@/lib/redirect'
 import { Spinner } from '@/components/Spinner'
 
 type Status = 'idle' | 'sending' | 'sent'
@@ -45,10 +46,19 @@ export default function LoginForm() {
 
     const supabase = createClient()
 
+    // Carry the post-login destination through the email link so the
+    // confirm page can return the user where they were originally going.
+    const next = safeRedirectPath(
+      new URLSearchParams(window.location.search).get('next')
+    )
+    const confirmUrl = `${window.location.origin}/auth/confirm${
+      next ? `?next=${encodeURIComponent(next)}` : ''
+    }`
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        emailRedirectTo: confirmUrl,
         captchaToken,
       },
     })

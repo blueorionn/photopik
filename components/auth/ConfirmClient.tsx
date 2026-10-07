@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { safeRedirectPath } from '@/lib/redirect'
 import { Spinner } from '@/components/Spinner'
 
 type Reason = 'expired' | 'used' | 'cross-device'
@@ -77,6 +78,7 @@ export default function ConfirmClient() {
 
     const supabase = createClient()
     const flowId = params.get('sb_flow_id')
+    const next = safeRedirectPath(params.get('next'))
 
     supabase.auth
       .exchangeCodeForSession(code!, flowId ? { flowId } : undefined)
@@ -90,10 +92,8 @@ export default function ConfirmClient() {
           return
         }
 
-        // Scrub code/error from the address bar so they never land
-        // in browser history, then navigate without a history entry.
         window.history.replaceState(null, '', window.location.pathname)
-        router.replace('/')
+        router.replace(next ?? '/')
       })
       .catch(() => setFailed(true))
   }, [router])
