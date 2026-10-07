@@ -2,19 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Sun,
-  Moon,
-  Bell,
-  CirclePlus,
-  Search,
-  User,
-  GalleryVertical,
-} from 'lucide-react'
+import { Sun, Moon, Bell, Search, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useThemeProvider } from '@/context/ThemeContext'
 
-// shared look for the header icon buttons — hairline box, muted glyph
 const ICON_BUTTON_CLASS =
   'border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer'
 
@@ -52,18 +43,6 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
             </Button>
 
             <Button
-              asChild
-              variant='ghost'
-              size='icon'
-              className={ICON_BUTTON_CLASS}
-            >
-              <Link href='/scroll' aria-label='Scroll mode'>
-                <GalleryVertical className='size-4' />
-              </Link>
-            </Button>
-
-            {/* stubs — wired up when notifications and upload exist */}
-            <Button
               variant='ghost'
               size='icon'
               aria-label='Notifications'
@@ -71,16 +50,7 @@ export default function HeaderClient({ userEmail }: { userEmail?: string }) {
             >
               <Bell className='size-4' />
             </Button>
-            <Button
-              variant='ghost'
-              size='icon'
-              aria-label='Upload photo'
-              className={ICON_BUTTON_CLASS}
-            >
-              <CirclePlus className='size-4' />
-            </Button>
 
-            {/* soft divider between app actions and the account cluster */}
             <div
               aria-hidden
               className='bg-foreground/20 dark:bg-foreground/30 mx-1 h-5 w-px shrink-0'
