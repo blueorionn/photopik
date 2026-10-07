@@ -42,6 +42,7 @@ export const photos = pgTable(
     slug: text('slug').notNull(),
     description: text('description'),
     license: photoLicense('license').notNull().default('reserved'),
+    attribution: text('attribution'),
     uploadedBy: uuid('uploaded_by').notNull(),
     uploadTime: timestamp('upload_time', { withTimezone: true })
       .notNull()
