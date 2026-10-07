@@ -6,8 +6,6 @@ export default async function HomePage() {
 
   return (
     <main className='mx-auto max-w-7xl px-4 pt-6 pb-24 sm:px-6 sm:pb-6'>
-      {/* cdnUrl('') yields the base prefix (host + photo folder) so the
-          client can build image URLs for pages loaded after hydration. */}
       <PhotoFeed initialPhotos={photos} cdnPrefix={cdnUrl('')} />
     </main>
   )

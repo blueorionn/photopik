@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { PUBLIC_FEED_LICENSES } from '@/lib/feed-filters'
 import type { FeedPhoto } from '@/lib/db/queries'
 
 // Keep in sync with getPublicFeed in lib/db/queries.ts — same filters,
@@ -48,6 +49,7 @@ export default function ScrollFeed({
       .eq('is_private', false)
       .is('deleted_at', null)
       .eq('is_nsfw', false)
+      .in('license', PUBLIC_FEED_LICENSES)
       .order('upload_time', { ascending: false })
       .range(from, from + PAGE_SIZE - 1)
 

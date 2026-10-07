@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Spinner } from '@/components/Spinner'
 import { createClient } from '@/lib/supabase/client'
+import { PUBLIC_FEED_LICENSES } from '@/lib/feed-filters'
 import type { FeedPhoto } from '@/lib/db/queries'
 
 // Keep in sync with MAX_PER_PAGE_LIMIT in lib/db/queries.ts — the server
@@ -116,16 +117,7 @@ export default function PhotoFeed({
       .eq('is_private', false)
       .is('deleted_at', null)
       .eq('is_nsfw', false)
-      .in('license', [
-        'public_domain',
-        'cc0_1_0',
-        'cc_by_3_0',
-        'cc_by_4_0',
-        'cc_by_sa_3_0',
-        'cc_by_sa_4_0',
-        'cc_by_nd_3_0',
-        'cc_by_nd_4_0',
-      ])
+      .in('license', PUBLIC_FEED_LICENSES)
       .order('upload_time', { ascending: false })
       .range(from, from + PAGE_SIZE - 1)
 

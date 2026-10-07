@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Photo } from '@/lib/db/schema'
+import { PUBLIC_FEED_LICENSES } from '@/lib/feed-filters'
 
 export type FeedPhoto = {
   id: string
@@ -25,16 +26,7 @@ export async function getPublicFeed(
     .eq('is_private', false)
     .is('deleted_at', null)
     .eq('is_nsfw', false)
-    .in('license', [
-      'public_domain',
-      'cc0_1_0',
-      'cc_by_3_0',
-      'cc_by_4_0',
-      'cc_by_sa_3_0',
-      'cc_by_sa_4_0',
-      'cc_by_nd_3_0',
-      'cc_by_nd_4_0',
-    ])
+    .in('license', PUBLIC_FEED_LICENSES)
     .order('upload_time', { ascending: false })
     .limit(limit)
 
