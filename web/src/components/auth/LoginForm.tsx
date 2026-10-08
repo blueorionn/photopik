@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import type { FormEvent } from 'react'
 import { Spinner } from '../Spinner'
 
@@ -24,10 +25,18 @@ export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
+
+  const turnstileRef = useRef<TurnstileInstance>(null)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (status === 'sending') return
+
+    if (!captchaToken) {
+      setError('Please complete the verification challenge.')
+      return
+    }
 
     setStatus('sending')
     setError(null)
@@ -91,13 +100,18 @@ export default function LoginForm() {
         </p>
       ) : null}
 
-      {/* TODO: replace with the real Turnstile widget when the API exists */}
-      <div
-        aria-hidden
-        className='border-border text-muted flex h-16.25 items-center justify-center rounded-lg border border-dashed text-xs'
-      >
-        Verification challenge placeholder
-      </div>
+      <Turnstile
+        ref={turnstileRef}
+        siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+        onSuccess={setCaptchaToken}
+        onExpire={() => setCaptchaToken(undefined)}
+        options={{ theme: 'auto', size: 'flexible' }}
+        onError={(errorcode) => {
+          setCaptchaToken(undefined)
+          console.error('Turnstile challenge failed:', errorcode)
+          setError('Verification failed. Refresh the page and try again.')
+        }}
+      />
 
       <button
         type='submit'
