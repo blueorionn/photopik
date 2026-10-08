@@ -121,6 +121,12 @@ body {
   overflow-x: hidden;
 }
 
+#root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .dark {
   color-scheme: dark;
 
