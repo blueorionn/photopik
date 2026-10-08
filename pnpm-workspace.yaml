@@ -1,6 +1,0 @@
-allowBuilds:
-  '@swc/core': false
-  esbuild: true
-  inotify: false
-  sharp: false
-  unrs-resolver: false
