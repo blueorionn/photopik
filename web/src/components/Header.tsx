@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Sun, Moon, Bell, Search, User } from 'lucide-react'
+import { Sun, Moon, Search, User } from 'lucide-react'
 import { Button } from './ui/button'
+import NotificationBell from './NotificationBell'
 import { useThemeProvider } from '../context/ThemeContext'
 
 const ICON_BUTTON_CLASS =
@@ -38,14 +39,7 @@ export default function Header({ userEmail }: { userEmail?: string }) {
               </Link>
             </Button>
 
-            <Button
-              variant='ghost'
-              size='icon'
-              aria-label='Notifications'
-              className={ICON_BUTTON_CLASS}
-            >
-              <Bell className='size-4' />
-            </Button>
+            <NotificationBell />
 
             <div
               aria-hidden
@@ -65,15 +59,7 @@ export default function Header({ userEmail }: { userEmail?: string }) {
                 <Search className='size-4' />
               </Link>
             </Button>
-            {/* stub — wired up when notifications exist */}
-            <Button
-              variant='ghost'
-              size='icon'
-              aria-label='Notifications'
-              className={ICON_BUTTON_CLASS}
-            >
-              <Bell className='size-4' />
-            </Button>
+            <NotificationBell />
             <div
               aria-hidden
               className='bg-foreground/20 dark:bg-foreground/30 mx-1 h-5 w-px shrink-0'
