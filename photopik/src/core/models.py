@@ -4,7 +4,17 @@ from datetime import datetime, timezone
 
 from photopik.src.extensions import db
 
-from sqlalchemy import (Integer, BigInteger, Boolean, DateTime, Text, String, text, ForeignKey, CheckConstraint)
+from sqlalchemy import (
+    Integer,
+    BigInteger,
+    Boolean,
+    DateTime,
+    Text,
+    String,
+    text,
+    ForeignKey,
+    CheckConstraint,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,7 +40,9 @@ class PhotoLicense(enum.Enum):
 class Photo(db.Model):
     __tablename__ = "photos"
 
-    photo_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
+    photo_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -43,7 +55,9 @@ class Photo(db.Model):
         ForeignKey("user.id"),
         nullable=False,
     )
-    upload_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))
+    upload_time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -91,8 +105,8 @@ class Photo(db.Model):
             name="photos_file_size_check",
         ),
         CheckConstraint(
-   "(is_deleted AND deleted_at IS NOT NULL) OR "
-    "(NOT is_deleted AND deleted_at IS NULL)",
-            name="photos_deletion_state_check"
-        )
+            "(is_deleted AND deleted_at IS NOT NULL) OR "
+            "(NOT is_deleted AND deleted_at IS NULL)",
+            name="photos_deletion_state_check",
+        ),
     )
