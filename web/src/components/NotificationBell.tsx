@@ -97,7 +97,7 @@ export default function NotificationBell() {
       {open && (
         <section
           aria-label='Notifications'
-          className='bg-popover text-popover-foreground border-border absolute top-full right-0 z-10 mt-2 w-80 rounded-xl border p-2 shadow-lg'
+          className='bg-popover text-popover-foreground border-border absolute top-full right-0 z-10 mt-2 w-80 rounded border p-2 shadow-lg'
         >
           <header className='flex items-center justify-between px-2 py-1.5'>
             <h2 className='text-foreground text-sm font-semibold'>
@@ -144,15 +144,6 @@ export default function NotificationBell() {
               </li>
             ))}
           </ul>
-
-          <footer className='border-border mt-1 border-t px-2 pt-1.5 pb-1'>
-            <button
-              type='button'
-              className='text-muted-foreground hover:text-foreground w-full cursor-pointer py-1 text-center text-xs font-medium transition-colors'
-            >
-              View all
-            </button>
-          </footer>
         </section>
       )}
     </div>
