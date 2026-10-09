@@ -28,13 +28,13 @@ collection_photos = Table(
     Column(
         "collection_id",
         UUID(as_uuid=True),
-        ForeignKey("collections.collection_id", ondelete="CASCADE"),
+        ForeignKey("collection.collection_id", ondelete="CASCADE"),
         primary_key=True,
     ),
     Column(
         "photo_id",
         UUID(as_uuid=True),
-        ForeignKey("photos.photo_id", ondelete="CASCADE"),
+        ForeignKey("photo.photo_id", ondelete="CASCADE"),
         primary_key=True,
         index=True,
     ),
@@ -91,7 +91,7 @@ class PhotoLicense(enum.Enum):
 
 
 class Photo(db.Model):
-    __tablename__ = "photos"
+    __tablename__ = "photo"
 
     photo_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
@@ -176,7 +176,7 @@ class Photo(db.Model):
 
 
 class Collection(db.Model):
-    __tablename__ = "collections"
+    __tablename__ = "collection"
 
     collection_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")

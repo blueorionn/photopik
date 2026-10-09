@@ -1,20 +1,17 @@
 import uuid
 import enum
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from photopik.src.extensions import db
 
 from sqlalchemy import (
-    Table,
-    Column,
-    Integer,
     BigInteger,
     Boolean,
+    Date,
     DateTime,
     Text,
     String,
     text,
-    ForeignKey,
     CheckConstraint,
 )
 from sqlalchemy import Enum as SAEnum
@@ -35,26 +32,25 @@ class UserRole(enum.Enum):
 
 
 class User(db.Model):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
     )
     email: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     username: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    phone_number: Mapped[int] = mapped_column(BigInteger, nullable=True, unique=True)
+    phone_number: Mapped[str] = mapped_column(String(15), nullable=True, unique=True)
     first_name: Mapped[str] = mapped_column(String(255), nullable=True)
     last_name: Mapped[str] = mapped_column(String(255), nullable=True)
     bio: Mapped[str] = mapped_column(Text, nullable=True)
-    dob: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=True)
+    dob: Mapped[date] = mapped_column(Date(timezone=False), nullable=True)
     gender: Mapped[str] = mapped_column(
         SAEnum(
             UserGender,
             name="user_gender",
             values_callable=lambda e: [m.value for m in e],
         ),
-        nullable=False,
-        server_default=text("'male'"),
+        nullable=True,
     )
     role: Mapped[str] = mapped_column(
         SAEnum(
@@ -88,11 +84,6 @@ class User(db.Model):
     )
 
     __table_args__ = (
-        CheckConstraint(
-            "(is_email_verified AND email IS NOT NULL) OR",
-            "(NOT is_email_verified AND email IS NULL)",
-            name="email_verification_state_check",
-        ),
         CheckConstraint(
             "(is_phone_verified AND phone_number IS NOT NULL) OR",
             "(NOT is_phone_verified AND phone_number IS NULL)",
