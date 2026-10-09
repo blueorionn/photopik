@@ -59,7 +59,7 @@ hidden_photos = Table(
     Column(
         "photo_id",
         UUID(as_uuid=True),
-        ForeignKey("photos.photo_id", ondelete="CASCADE"),
+        ForeignKey("photo.photo_id", ondelete="CASCADE"),
         primary_key=True,
         index=True,
     ),
@@ -161,16 +161,16 @@ class Photo(db.Model):
     __table_args__ = (
         CheckConstraint(
             "width > 0 AND height > 0",
-            name="photos_dimensions_check",
+            name="photo_dimensions_check",
         ),
         CheckConstraint(
             "file_size > 0",
-            name="photos_file_size_check",
+            name="photo_file_size_check",
         ),
         CheckConstraint(
             "(is_deleted AND deleted_at IS NOT NULL) OR "
             "(NOT is_deleted AND deleted_at IS NULL)",
-            name="photos_deletion_state_check",
+            name="photo_deletion_state_check",
         ),
     )
 
