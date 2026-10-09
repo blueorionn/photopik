@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from photopik.src.extensions import db
 
 from sqlalchemy import (
+    Table,
+    Column,
     Integer,
     BigInteger,
     Boolean,
@@ -17,6 +19,31 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
+
+
+# Association table
+collection_photos = Table(
+    "collection_photos",
+    db.metadata,
+    Column(
+        "collection_id",
+        UUID(as_uuid=True),
+        ForeignKey("collections.collection_id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "photo_id",
+        UUID(as_uuid=True),
+        ForeignKey("photos.photo_id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "added_at",
+        DateTime(timezone=True),
+        server_default=text("now()"),
+        nullable=False,
+    ),
+)
 
 
 class PhotoLicense(enum.Enum):
@@ -52,7 +79,7 @@ class Photo(db.Model):
         server_default=text("'reserved'"),
     )
     uploaded_by: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id"),
+        ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False,
     )
     upload_time: Mapped[datetime] = mapped_column(
@@ -95,6 +122,11 @@ class Photo(db.Model):
         nullable=True,
     )
 
+    # collection relationship
+    collections: Mapped[list["Collection"]] = db.relationship(
+        secondary=collection_photos, back_populates="photos"
+    )
+
     __table_args__ = (
         CheckConstraint(
             "width > 0 AND height > 0",
@@ -108,5 +140,56 @@ class Photo(db.Model):
             "(is_deleted AND deleted_at IS NOT NULL) OR "
             "(NOT is_deleted AND deleted_at IS NULL)",
             name="photos_deletion_state_check",
+        ),
+    )
+
+
+class Collection(db.Model):
+    __tablename__ = "collections"
+
+    collection_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    slug: Mapped[str] = mapped_column(Text, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+    is_private = Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=text("true"),
+    )
+    is_deleted = Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=text("false"),
+    )
+    deleted_at = Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    photos: Mapped[list["Photo"]] = db.relationship(
+        secondary=collection_photos, back_populates="collections"
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "(is_deleted AND deleted_at IS NOT NULL) OR "
+            "(NOT is_deleted AND deleted_at IS NULL)",
+            name="collection_deletion_state_check",
         ),
     )
