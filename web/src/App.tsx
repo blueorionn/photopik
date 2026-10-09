@@ -5,6 +5,7 @@ import ConfirmPage from './pages/auth/ConfirmPage'
 import ErrorPage from './pages/auth/ErrorPage'
 import LoginPage from './pages/auth/LoginPage'
 import LogoutPage from './pages/auth/LogoutPage'
+import SearchPage from './pages/search/SearchPage'
 
 function AppLayout() {
   return (
@@ -21,7 +22,7 @@ function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path='/' element={<div className='flex-1' />} />
-        <Route path='/search' element={<div className='flex-1' />} />
+        <Route path='/search' element={<SearchPage />} />
         <Route path='/account' element={<div className='flex-1' />} />
       </Route>
       <Route path='/auth/login' element={<LoginPage />} />
