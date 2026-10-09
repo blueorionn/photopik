@@ -131,7 +131,7 @@ class Photo(db.Model):
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     file_size: Mapped[int] = mapped_column(BigInteger, nullable=False)
     mime_type: Mapped[str] = mapped_column(String(128), nullable=False)
-    storage_key: Mapped[str] = mapped_column(Text, nullable=False)
+    storage_key: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     file_hash: Mapped[str] = mapped_column(String(512), nullable=False)
     is_nsfw: Mapped[bool] = mapped_column(
         Boolean,
