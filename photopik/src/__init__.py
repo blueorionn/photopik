@@ -3,7 +3,7 @@
 from flask import Flask, jsonify
 
 from .settings import config
-from .extensions import init_cors
+from .extensions import init_cors, init_db
 from .views import blueprint as base_blueprint
 
 
@@ -30,6 +30,7 @@ def register_extension(app: Flask):
     """Registering extensions."""
 
     init_cors(app)
+    init_db(app)
 
 
 def register_blueprints(app: Flask):
