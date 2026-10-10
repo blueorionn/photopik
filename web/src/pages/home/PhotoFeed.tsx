@@ -75,7 +75,7 @@ function SkeletonCard({ width, height }: { width: number; height: number }) {
       <div className='bg-muted/25 absolute inset-0' />
       <div
         aria-hidden
-        className='animate-card-shimmer from-transparent via-foreground/10 to-transparent absolute inset-x-0 -top-1/2 h-1/2 bg-gradient-to-b motion-reduce:animate-none'
+        className='animate-card-shimmer via-foreground/10 absolute inset-x-0 -top-1/2 h-1/2 bg-gradient-to-b from-transparent to-transparent motion-reduce:animate-none'
       />
     </div>
   )
@@ -116,7 +116,10 @@ export default function PhotoFeed({
     () => distribute(SKELETON_ASPECTS, columnCount),
     [columnCount]
   )
-  const columns = useMemo(() => distribute(photos, columnCount), [photos, columnCount])
+  const columns = useMemo(
+    () => distribute(photos, columnCount),
+    [photos, columnCount]
+  )
 
   // TODO: fetch pages from the feed API (infinite scroll + the empty state
   // come with it). Until then a photo-less feed renders the loading skeleton.
