@@ -5,16 +5,18 @@ from datetime import date, datetime, timezone
 from photopik.src.extensions import db
 
 from sqlalchemy import (
+    Integer,
     Boolean,
     Date,
     DateTime,
     Text,
     String,
     text,
+    ForeignKey,
     CheckConstraint,
 )
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import UUID, CITEXT
+from sqlalchemy.dialects.postgresql import ARRAY, CITEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -103,4 +105,32 @@ class User(db.Model):
             "(NOT is_phone_verified AND phone_number IS NULL)",
             name="phone_number_verification_state_check",
         ),
+    )
+
+class WebAuthnCredential(db.Model):
+    __tablename__ = "webauthn_credential"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    credential_id: Mapped[str] = mapped_column(Text, unique=True)
+    public_key: Mapped[str] = mapped_column(Text, nullable=False)
+    sign_count: Mapped[int] = mapped_column(Integer, default=0)
+    label: Mapped[str] = mapped_column(String(255), nullable=False)
+    transports: Mapped[list[str] | None] = mapped_column(
+        ARRAY(String), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )
+    last_used_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
     )

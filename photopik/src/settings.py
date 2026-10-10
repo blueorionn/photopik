@@ -10,6 +10,8 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", generate_secret_key())
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+
+    # Database
     SQLALCHEMY_DATABASE_URI = os.environ["SQLALCHEMY_DATABASE_URI"]
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_size": 5,  # persistent connections per worker
@@ -19,6 +21,8 @@ class Config:
         "pool_pre_ping": True,  # verify connection is alive before using it
     }
 
+    # Webauthn
+    WEBAUTHN_RP_NAME = "Photopik"
 
 class DevelopmentConfig(Config):
     """Development Configuration."""
@@ -26,6 +30,10 @@ class DevelopmentConfig(Config):
     ENV = "dev"
     DEBUG = True
     CORS_ORIGINS = "*"
+
+    # Webauthn
+    WEBAUTHN_RP_ID: str = "localhost"
+    WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
 
 
 class ProductionConfig(Config):
@@ -35,6 +43,13 @@ class ProductionConfig(Config):
     DEBUG = False
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
 
+    # Webauthn
+    WEBAUTHN_RP_ID: str = os.environ["WEBAUTHN_RP_ID"].strip()
+    WEBAUTHN_ORIGINS: list[str] =  [
+        origin.strip()
+        for origin in os.environ["WEBAUTHN_ORIGINS"].split(",")
+        if origin.strip()
+    ]
 
 class TestingConfig(Config):
     """Testing Configuration."""
@@ -43,6 +58,10 @@ class TestingConfig(Config):
     DEBUG = True
     CORS_ORIGINS = "*"
     SQLALCHEMY_DATABASE_URI = "sqlite://"
+
+    # Webauthn
+    WEBAUTHN_RP_ID: str = "localhost"
+    WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
 
 
 _CONFIGS = {
