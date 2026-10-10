@@ -75,7 +75,7 @@ function SkeletonCard({ width, height }: { width: number; height: number }) {
       <div className='bg-muted/25 absolute inset-0' />
       <div
         aria-hidden
-        className='animate-card-shimmer via-foreground/10 absolute inset-x-0 -top-1/2 h-1/2 bg-gradient-to-b from-transparent to-transparent motion-reduce:animate-none'
+        className='animate-card-shimmer via-foreground/10 absolute inset-x-0 -top-1/2 h-1/2 bg-linear-to-b from-transparent to-transparent motion-reduce:animate-none'
       />
     </div>
   )
