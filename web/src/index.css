@@ -113,6 +113,18 @@
       transform: translateY(0);
     }
   }
+
+  /* Skeleton sweep used by the photo feed while images load. */
+  --animate-card-shimmer: card-shimmer 1.8s ease-in-out infinite;
+
+  @keyframes card-shimmer {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(300%);
+    }
+  }
 }
 
 body {
