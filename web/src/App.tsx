@@ -24,6 +24,8 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path='/' element={<HomePage />} />
         <Route path='/search' element={<SearchPage />} />
+        <Route path='/collections' element={<div className='flex-1' />} />
+        <Route path='/upload' element={<div className='flex-1' />} />
         <Route path='/account' element={<div className='flex-1' />} />
       </Route>
       <Route path='/auth/login' element={<LoginPage />} />
