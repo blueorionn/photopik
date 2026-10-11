@@ -47,6 +47,7 @@ class UserStatus(enum.Enum):
 class MagicTokenPurpose(enum.Enum):
     """Purposes for single-use magic tokens."""
 
+    INVITE = "invite"
     LOGIN = "login"
     WEBAUTHN_ENROLL = "webauthn_enroll"
 
