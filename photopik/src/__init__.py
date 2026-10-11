@@ -58,3 +58,12 @@ def register_error_handlers(app: Flask):
     @app.errorhandler(429)
     def too_many_requests(e):
         return jsonify({"code": "429", "message": "Too Many Requests"}), 429
+
+    @app.errorhandler(422)
+    def handle_422_error(error):
+        return (
+            jsonify(
+                {"code": "422", "message": "The request contains semantic errors."}
+            ),
+            422,
+        )

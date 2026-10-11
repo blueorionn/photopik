@@ -67,6 +67,9 @@ class ProductionConfig(Config):
         if origin.strip()
     ]
 
+    # JWT
+    JWT_COOKIE_SECURE = True
+
     # Frontend
     FRONTEND_URL = os.environ["FRONTEND_URL"].strip()
 
