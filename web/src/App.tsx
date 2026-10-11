@@ -5,6 +5,7 @@ import ConfirmPage from './pages/auth/ConfirmPage'
 import ErrorPage from './pages/auth/ErrorPage'
 import LoginPage from './pages/auth/LoginPage'
 import LogoutPage from './pages/auth/LogoutPage'
+import CollectionsPage from './pages/collections/CollectionsPage'
 import HomePage from './pages/home/HomePage'
 import SearchPage from './pages/search/SearchPage'
 
@@ -24,7 +25,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path='/' element={<HomePage />} />
         <Route path='/search' element={<SearchPage />} />
-        <Route path='/collections' element={<div className='flex-1' />} />
+        <Route path='/collections' element={<CollectionsPage />} />
         <Route path='/upload' element={<div className='flex-1' />} />
         <Route path='/account' element={<div className='flex-1' />} />
       </Route>
