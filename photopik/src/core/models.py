@@ -73,6 +73,8 @@ hidden_photos = Table(
 
 
 class PhotoLicense(enum.Enum):
+    """Licensing options under which a photo is published."""
+
     RESERVED = "reserved"
     PUBLIC_DOMAIN = "public_domain"
     CC0_1_0 = "cc0_1_0"
@@ -91,6 +93,8 @@ class PhotoLicense(enum.Enum):
 
 
 class Photo(db.Model):
+    """An uploaded photograph and its file metadata."""
+
     __tablename__ = "photo"
 
     photo_id: Mapped[uuid.UUID] = mapped_column(
@@ -176,6 +180,8 @@ class Photo(db.Model):
 
 
 class Collection(db.Model):
+    """A user-curated group of photos."""
+
     __tablename__ = "collection"
 
     collection_id: Mapped[uuid.UUID] = mapped_column(

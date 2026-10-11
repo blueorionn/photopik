@@ -21,29 +21,39 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 
 class UserGender(enum.Enum):
+    """Gender options for user profiles."""
+
     MALE = "male"
     FEMALE = "female"
     OTHER = "other"
 
 
 class UserRole(enum.Enum):
+    """Access roles controlling permissions."""
+
     ADMIN = "admin"
     STAFF = "staff"
     USER = "user"
 
 
 class UserStatus(enum.Enum):
+    """Account lifecycle states."""
+
     INVITED = "invited"
     ACTIVE = "active"
     SUSPENDED = "suspended"
 
 
 class MagicTokenPurpose(enum.Enum):
+    """Purposes for single-use magic tokens."""
+
     LOGIN = "login"
     WEBAUTHN_ENROLL = "webauthn_enroll"
 
 
 class User(db.Model):
+    """User account with role, status, and profile fields."""
+
     __tablename__ = "user"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -114,6 +124,8 @@ class User(db.Model):
 
 
 class WebAuthnCredential(db.Model):
+    """A registered WebAuthn passkey or security key."""
+
     __tablename__ = "webauthn_credential"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -141,6 +153,8 @@ class WebAuthnCredential(db.Model):
 
 
 class MagicToken(db.Model):
+    """Single-use email-delivered token for login or enrollment links."""
+
     __tablename__ = "magic_token"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -170,6 +184,8 @@ class MagicToken(db.Model):
 
 
 class RefreshToken(db.Model):
+    """Server-side record of an issued refresh JWT for rotation/revocation."""
+
     __tablename__ = "refresh_token"
 
     id: Mapped[uuid.UUID] = mapped_column(
