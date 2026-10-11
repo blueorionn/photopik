@@ -38,6 +38,11 @@ class UserStatus(enum.Enum):
     SUSPENDED = "suspended"
 
 
+class MagicTokenPurpose(enum.Enum):
+    LOGIN = "login"
+    WEBAUTHN_ENROLL = "webauthn_enroll"
+
+
 class User(db.Model):
     __tablename__ = "user"
 
@@ -132,4 +137,58 @@ class WebAuthnCredential(db.Model):
     last_used_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
+    )
+
+
+class MagicToken(db.Model):
+    __tablename__ = "magic_token"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    purpose: Mapped[str] = mapped_column(
+        SAEnum(
+            MagicTokenPurpose,
+            name="magic_token_purpose",
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=False,
+    )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    used_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
+class RefreshToken(db.Model):
+    __tablename__ = "refresh_token"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    jti: Mapped[str] = mapped_column(String(36), unique=True, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    revoked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    replaced_by: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("refresh_token.id"),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
