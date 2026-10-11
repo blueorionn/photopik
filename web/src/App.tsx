@@ -6,6 +6,7 @@ import ErrorPage from './pages/auth/ErrorPage'
 import LoginPage from './pages/auth/LoginPage'
 import LogoutPage from './pages/auth/LogoutPage'
 import CollectionsPage from './pages/collections/CollectionsPage'
+import NotFoundPage from './pages/handlers/NotFoundPage'
 import HomePage from './pages/home/HomePage'
 import SearchPage from './pages/search/SearchPage'
 
@@ -34,6 +35,7 @@ function App() {
       <Route path='/auth/error' element={<ErrorPage />} />
       <Route path='/auth/logout' element={<LogoutPage />} />
       <Route path='/scroll' element={<div className='h-dvh bg-black' />} />
+      <Route path='*' element={<NotFoundPage />} />
     </Routes>
   )
 }
