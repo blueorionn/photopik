@@ -1,6 +1,7 @@
 """Application Configuration."""
 
 import os
+from datetime import timedelta
 from .utils import generate_secret_key
 
 
@@ -24,6 +25,18 @@ class Config:
     # Webauthn
     WEBAUTHN_RP_NAME = "Photopik"
 
+    # Authentication
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]  # access via header, refresh via cookie
+    JWT_COOKIE_SAMESITE = "Strict"
+    JWT_COOKIE_CSRF_PROTECT = True
+    JWT_REFRESH_COOKIE_PATH = os.environ.get(
+        "JWT_REFRESH_COOKIE_PATH", "/auth/"
+    )  # cookie only sent to auth routes
+    MAGIC_LINK_TTL_MINUTES = 15
+
+
 class DevelopmentConfig(Config):
     """Development Configuration."""
 
@@ -35,6 +48,9 @@ class DevelopmentConfig(Config):
     WEBAUTHN_RP_ID: str = "localhost"
     WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
 
+    # Frontend
+    FRONTEND_URL = "http://localhost:5000"
+
 
 class ProductionConfig(Config):
     """Production Configuration."""
@@ -45,11 +61,15 @@ class ProductionConfig(Config):
 
     # Webauthn
     WEBAUTHN_RP_ID: str = os.environ["WEBAUTHN_RP_ID"].strip()
-    WEBAUTHN_ORIGINS: list[str] =  [
+    WEBAUTHN_ORIGINS: list[str] = [
         origin.strip()
         for origin in os.environ["WEBAUTHN_ORIGINS"].split(",")
         if origin.strip()
     ]
+
+    # Frontend
+    FRONTEND_URL = os.environ["FRONTEND_URL"].strip()
+
 
 class TestingConfig(Config):
     """Testing Configuration."""
@@ -62,6 +82,9 @@ class TestingConfig(Config):
     # Webauthn
     WEBAUTHN_RP_ID: str = "localhost"
     WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
+
+    # Frontend
+    FRONTEND_URL = "http://localhost:5000"
 
 
 _CONFIGS = {

@@ -107,6 +107,7 @@ class User(db.Model):
         ),
     )
 
+
 class WebAuthnCredential(db.Model):
     __tablename__ = "webauthn_credential"
 
@@ -122,9 +123,7 @@ class WebAuthnCredential(db.Model):
     public_key: Mapped[str] = mapped_column(Text, nullable=False)
     sign_count: Mapped[int] = mapped_column(Integer, default=0)
     label: Mapped[str] = mapped_column(String(255), nullable=False)
-    transports: Mapped[list[str] | None] = mapped_column(
-        ARRAY(String), nullable=True
-    )
+    transports: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
