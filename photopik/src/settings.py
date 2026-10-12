@@ -36,6 +36,10 @@ class Config:
     )  # cookie only sent to auth routes
     MAGIC_LINK_TTL_MINUTES = 15
 
+    # AWS configuration
+    AWS_SES_REGION = os.environ.get("AWS_SES_REGION", "us-east-1")
+    SES_SENDER = os.environ.get("SES_SENDER", "noreply@functionbasket.com")
+
 
 class DevelopmentConfig(Config):
     """Development Configuration."""
