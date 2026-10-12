@@ -2,7 +2,7 @@ import uuid
 import enum
 from datetime import date, datetime, timezone
 
-from photopik.src.extensions import db
+from ..extensions import db
 
 from sqlalchemy import (
     Integer,

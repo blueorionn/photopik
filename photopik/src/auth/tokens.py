@@ -7,8 +7,8 @@ from datetime import datetime, timedelta, timezone
 from flask import current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
 
-from photopik.src.extensions import db
-from photopik.src.auth.models import (
+from ..extensions import db
+from .models import (
     MagicToken,
     MagicTokenPurpose,
     RefreshToken,
