@@ -30,7 +30,7 @@ def create_magic_token(user: User, purpose: MagicTokenPurpose, ttl: timedelta) -
     """Create a single-use magic token row and return the raw token.
 
     :param user: owner of the token
-    :param purpose: LOGIN (magic link) or WEBAUTHN_ENROLL (bootstrap)
+    :param purpose: INVITE (invite) | LOGIN (magic link) | WEBAUTHN_ENROLL (bootstrap)
     :param ttl: validity window (e.g. 15 min for login, 24 h for enroll)
     """
 
