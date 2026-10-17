@@ -1,7 +1,32 @@
 # env files
 .env*
-!.env.dev.example
-!.env.prod.example
+!.env.web.dev.example
+!.env.web.prod.example
+!.env.api.dev.example
+!.env.api.prod.example
+
+# web
+node_modules
+dist
+dist-ssr
+*.local
+
+# api
+venv/
+env/
+ENV/
+.venv/
+
+# api cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Databases (If using SQLite locally)
+*.db
+*.sqlite
+*.sqlite3
 
 # ignore directories
 todo/
