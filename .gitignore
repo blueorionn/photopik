@@ -1,9 +1,7 @@
 # env files
 .env*
-!.env.web.dev.example
-!.env.web.prod.example
-!.env.api.dev.example
-!.env.api.prod.example
+!.env.dev.example
+!.env.prod.example
 
 # web
 node_modules
@@ -11,23 +9,75 @@ dist
 dist-ssr
 *.local
 
-# api
-venv/
-env/
-ENV/
-.venv/
 
-# api cache
+# Python Core & Bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Databases (If using SQLite locally)
+# Environments & Virtual Envs
+.flaskenv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+
+# The instance directory hosts local app configuration like secrets, tokens, etc.
+instance/
+.webassets-cache
+
+# Databases (Local Development)
 *.db
 *.sqlite
 *.sqlite3
+app.db
 
-# ignore directories
-todo/
-tmp/
+# Testing & Code Quality
+.target/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.htmlcov/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Log.txt
+
+# Application Logs
+logs/
+*.log
