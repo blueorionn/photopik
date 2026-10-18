@@ -12,7 +12,11 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
     # Database
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite://db.sqlite3")
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "SQLALCHEMY_DATABASE_URI", "sqlite://db.sqlite3"
+    )
+
+
 class DevelopmentConfig(Config):
     """Development Configuration."""
 
@@ -27,6 +31,7 @@ class ProductionConfig(Config):
     ENV = "prod"
     DEBUG = False
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
+
 
 class TestingConfig(Config):
     """Testing Configuration."""
