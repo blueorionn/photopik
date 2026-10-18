@@ -12,28 +12,13 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
     # Database
-    SQLALCHEMY_DATABASE_URI = os.environ["SQLALCHEMY_DATABASE_URI"]
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": 5,  # persistent connections per worker
-        "max_overflow": 5,  # extra connections under burst load
-        "pool_timeout": 30,  # wait limit before giving up on a connection
-        "pool_recycle": 280,  # recycle before server/proxy idle-kills (e.g. 300s)
-        "pool_pre_ping": True,  # verify connection is alive before using it
-    }
-
-    # Webauthn
-    WEBAUTHN_RP_NAME = "Photopik"
-
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite://db.sqlite3")
 class DevelopmentConfig(Config):
     """Development Configuration."""
 
     ENV = "dev"
     DEBUG = True
     CORS_ORIGINS = "*"
-
-    # Webauthn
-    WEBAUTHN_RP_ID: str = "localhost"
-    WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
 
 
 class ProductionConfig(Config):
@@ -43,25 +28,12 @@ class ProductionConfig(Config):
     DEBUG = False
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
 
-    # Webauthn
-    WEBAUTHN_RP_ID: str = os.environ["WEBAUTHN_RP_ID"].strip()
-    WEBAUTHN_ORIGINS: list[str] =  [
-        origin.strip()
-        for origin in os.environ["WEBAUTHN_ORIGINS"].split(",")
-        if origin.strip()
-    ]
-
 class TestingConfig(Config):
     """Testing Configuration."""
 
     TESTING = True
     DEBUG = True
     CORS_ORIGINS = "*"
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-
-    # Webauthn
-    WEBAUTHN_RP_ID: str = "localhost"
-    WEBAUTHN_ORIGINS: list[str] = ["http://localhost:5000"]
 
 
 _CONFIGS = {
