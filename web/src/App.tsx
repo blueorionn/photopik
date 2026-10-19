@@ -1,21 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ASPECT_RATIOS, IMAGE_MODELS, demoImage, dimensionsFor } from './models'
+import { ASPECT_RATIOS, IMAGE_MODELS } from './lib/models'
+import { dimensionsFor, demoImage } from './utils/image'
+import { type HistoryItem } from './types/history'
 import { Sun, Moon } from 'lucide-react'
 
-interface HistoryItem {
-  id: number
-  src: string
-  prompt: string
-  model: string
-  seed: number
-  width: number
-  height: number
-  format: string
-  at: string
-}
-
 const SETTINGS_KEY = 'photopik-settings'
-const KEY_STORAGE = 'photopik-openrouter-key'
 
 function randomSeed() {
   return Math.floor(Math.random() * 999_999_999)
@@ -37,13 +26,6 @@ export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   )
-  const [apiKey, setApiKey] = useState(
-    () => localStorage.getItem(KEY_STORAGE) ?? ''
-  )
-  const [rememberKey, setRememberKey] = useState(() =>
-    Boolean(localStorage.getItem(KEY_STORAGE))
-  )
-  const [showKey, setShowKey] = useState(false)
   const [keyError, setKeyError] = useState('')
   const [modelId, setModelId] = useState(() =>
     typeof saved.modelId === 'string' ? saved.modelId : IMAGE_MODELS[0].id
@@ -119,21 +101,6 @@ export default function App() {
     const d = dimensionsFor(aspect, value)
     setWidth(d.width)
     setHeight(d.height)
-  }
-
-  const connected = apiKey.trim().startsWith('sk-or-')
-
-  function saveKey() {
-    const value = apiKey.trim()
-    if (value && !value.startsWith('sk-or-')) {
-      setKeyError(
-        'OpenRouter keys start with sk-or-. Check the key and try again.'
-      )
-      return
-    }
-    setKeyError('')
-    if (rememberKey && value) localStorage.setItem(KEY_STORAGE, value)
-    else localStorage.removeItem(KEY_STORAGE)
   }
 
   function generate() {
