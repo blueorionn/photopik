@@ -238,50 +238,6 @@ export default function App() {
               <span className='text-muted font-normal'>connection</span>
             </h2>
             <div className={fieldCls}>
-              <label htmlFor='api-key' className={labelCls}>
-                API key
-              </label>
-              <div className='flex items-center gap-2'>
-                <input
-                  id='api-key'
-                  type={showKey ? 'text' : 'password'}
-                  autoComplete='off'
-                  placeholder='sk-or-...'
-                  value={apiKey}
-                  className={inputCls}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  onBlur={saveKey}
-                />
-                <button
-                  type='button'
-                  className={btnCls}
-                  onClick={() => setShowKey(!showKey)}
-                >
-                  {showKey ? 'Hide' : 'Show'}
-                </button>
-              </div>
-              {keyError ? (
-                <small className='text-danger text-xs' role='alert'>
-                  {keyError}
-                </small>
-              ) : (
-                <small className={hintCls}>
-                  Sent only to OpenRouter via your backend later. Never commit
-                  it.
-                </small>
-              )}
-            </div>
-            <label className='flex items-center gap-2 text-[13px]'>
-              <input
-                type='checkbox'
-                checked={rememberKey}
-                onChange={(e) => {
-                  setRememberKey(e.target.checked)
-                }}
-              />
-              Remember key on this device
-            </label>
-            <div className={fieldCls}>
               <label htmlFor='base-url' className={labelCls}>
                 Base URL
               </label>
@@ -343,25 +299,6 @@ export default function App() {
                   and lighting.
                 </small>
               )}
-            </div>
-            <div className={fieldCls}>
-              <label htmlFor='negative' className={labelCls}>
-                Negative prompt <em>optional</em>
-              </label>
-              <textarea
-                id='negative'
-                rows={2}
-                value={negativePrompt}
-                disabled={!model.supportsNegativePrompt}
-                placeholder='blurry, low quality, distorted hands'
-                onChange={(e) => setNegativePrompt(e.target.value)}
-                className={`${inputCls} resize-y`}
-              />
-              <small className={hintCls}>
-                {model.supportsNegativePrompt
-                  ? 'Things the model should avoid.'
-                  : `${model.name} does not support a negative prompt, so this is disabled.`}
-              </small>
             </div>
           </section>
 
@@ -606,13 +543,6 @@ export default function App() {
             >
               Reset all settings
             </button>
-            {!connected && (
-              <p className='border-border bg-warning-bg text-warning rounded-lg border px-3 py-2.5 text-[13px] leading-relaxed'>
-                Demo preview mode: no valid OpenRouter key, so Generate shows a
-                local placeholder. Add a key and connect the Flask backend for
-                real images.
-              </p>
-            )}
           </div>
         </aside>
 
