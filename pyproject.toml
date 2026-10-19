@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "flask",
+    "flask[async]",
     "flask-cors>=6.0.5",
     "flask-sqlalchemy>=3.1.1",
     "sqlalchemy>=2.1.5",
@@ -16,6 +16,7 @@ dependencies = [
     "httpx>=0.27.0",
     "python-dotenv>=1.0.0",
     "gunicorn>=23.0.0; sys_platform != 'win32'",
+    "pydantic>=2.14.1",
 ]
 
 [project.optional-dependencies]

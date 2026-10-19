@@ -4,7 +4,7 @@ from flask import Flask, jsonify
 
 from .settings import config
 from .extensions import init_cors
-from .views import blueprint as base_blueprint
+from .core.urls import blueprint as base_blueprint
 
 
 def create_app(config_object=config):
