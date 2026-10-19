@@ -267,6 +267,25 @@ export default function App() {
                 </small>
               )}
             </div>
+            <div className={fieldCls}>
+              <label htmlFor='negative' className={labelCls}>
+                Negative prompt <em>optional</em>
+              </label>
+              <textarea
+                id='negative'
+                rows={2}
+                value={negativePrompt}
+                disabled={!model.supportsNegativePrompt}
+                placeholder='blurry, low quality, distorted hands'
+                onChange={(e) => setNegativePrompt(e.target.value)}
+                className={`${inputCls} resize-y`}
+              />
+              <small className={hintCls}>
+                {model.supportsNegativePrompt
+                  ? 'Things the model should avoid.'
+                  : `${model.name} does not support a negative prompt, so this is disabled.`}
+              </small>
+            </div>
           </section>
 
           <section className='flex flex-col gap-2.5' aria-labelledby='size-h'>
