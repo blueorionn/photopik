@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -42,8 +42,8 @@
   --color-danger-bg: var(--danger-bg);
   --color-warning: var(--warning);
   --color-warning-bg: var(--warning-bg);
-  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }
 
 @layer base {
