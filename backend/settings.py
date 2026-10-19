@@ -16,6 +16,9 @@ class Config:
         "SQLALCHEMY_DATABASE_URI", "sqlite://db.sqlite3"
     )
 
+    # Openrouter key
+    OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+
 
 class DevelopmentConfig(Config):
     """Development Configuration."""
