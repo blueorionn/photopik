@@ -1,20 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
-import { fetchTextToImageModels, API_BASE_URL } from './lib/api'
+import {
+  fetchTextToImageModels,
+  generateImage as generateImageFromApi,
+  API_BASE_URL,
+} from './lib/api'
 import {
   DEFAULT_MODEL_ID,
   FALLBACK_CAPABILITIES,
   deriveCapabilities,
 } from './lib/models'
-import { dimensionsFor, demoImage } from './utils/image'
+import { dimensionsFor } from './utils/image'
 import { type HistoryItem } from './types/history'
 import type { ImageModel } from './types/models'
+import { randomSeed } from './utils/base'
 import { Sun, Moon } from 'lucide-react'
 
 const SETTINGS_KEY = 'photopik-settings'
-
-function randomSeed() {
-  return Math.floor(Math.random() * 999_999_999)
-}
 
 function loadSettings(): Record<string, unknown> {
   try {
@@ -62,6 +63,8 @@ export default function App() {
   >('idle')
   const [current, setCurrent] = useState<HistoryItem | null>(null)
   const [history, setHistory] = useState<HistoryItem[]>([])
+  const [genError, setGenError] = useState('')
+  const [genProgress, setGenProgress] = useState('')
 
   const model = useMemo(
     () => models.find((m) => m.id === modelId),
@@ -152,7 +155,7 @@ export default function App() {
     setHeight(d.height)
   }
 
-  function generate() {
+  async function generate() {
     if (!model) {
       setPromptError('No model loaded yet. Wait for models to load, or retry.')
       return
@@ -162,28 +165,81 @@ export default function App() {
       return
     }
     setPromptError('')
-    const usedSeed = randomSeedOn ? randomSeed() : seed
-    if (randomSeedOn) setSeed(usedSeed)
+    setGenError('')
+    const baseSeed = randomSeedOn ? randomSeed() : seed
+    if (randomSeedOn) setSeed(baseSeed)
     setStatus('generating')
-    window.setTimeout(() => {
-      const item: HistoryItem = {
-        id: Date.now(),
-        src: demoImage(prompt, usedSeed, width, height),
-        prompt: prompt.trim(),
-        model: modelId,
-        seed: usedSeed,
-        width,
-        height,
-        format,
-        at: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+
+    const items: HistoryItem[] = []
+    try {
+      for (let i = 0; i < count; i++) {
+        const usedSeed = caps.supportsSeed ? baseSeed + i : baseSeed
+        setGenProgress(
+          count > 1 ? `Generating image ${i + 1} of ${count}…` : 'Generating…'
+        )
+        const controller = new AbortController()
+        const timer = window.setTimeout(() => controller.abort(), 180_000)
+        try {
+          const src = await generateImageFromApi(
+            {
+              prompt: prompt.trim(),
+              model: modelId,
+              ...(caps.supportsNegativePrompt && negativePrompt.trim()
+                ? { negative_prompt: negativePrompt.trim() }
+                : {}),
+              aspect_ratio: aspect,
+              resolution,
+              ...(caps.supportsSeed ? { seed: usedSeed } : {}),
+              n: 1,
+              ...(caps.qualityValues.length > 0 ? { quality } : {}),
+              output_format: format,
+              width,
+              height,
+            },
+            controller.signal
+          )
+          items.push({
+            id: Date.now() + i,
+            src,
+            prompt: prompt.trim(),
+            model: modelId,
+            seed: usedSeed,
+            width,
+            height,
+            format,
+            at: new Date().toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          })
+        } finally {
+          window.clearTimeout(timer)
+        }
       }
-      setCurrent(item)
-      setHistory((h) => [item, ...h].slice(0, 12))
+      setCurrent(items[0])
+      setHistory((h) => [...items, ...h].slice(0, 12))
       setStatus('done')
-    }, 900)
+    } catch (err) {
+      if (items.length > 0) {
+        setCurrent(items[0])
+        setHistory((h) => [...items, ...h].slice(0, 12))
+        setStatus('done')
+        setGenError(
+          `Generated ${items.length} of ${count} images, then the API failed.`
+        )
+      } else {
+        setStatus('error')
+        setGenError(
+          err instanceof DOMException && err.name === 'AbortError'
+            ? 'Generation timed out after 180 seconds. Try again or pick a faster model.'
+            : err instanceof Error
+              ? err.message
+              : 'Generation failed. Check that the API server is running.'
+        )
+      }
+    } finally {
+      setGenProgress('')
+    }
   }
 
   function resetAll() {
@@ -200,6 +256,7 @@ export default function App() {
     setFormat('png')
     setStatus('idle')
     setCurrent(null)
+    setGenError('')
   }
 
   function restore(item: HistoryItem) {
@@ -589,7 +646,9 @@ export default function App() {
               disabled={status === 'generating'}
               className='border-accent bg-accent hover:bg-accent-hover w-full rounded-lg border px-4 py-3 text-[15px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-55'
             >
-              {status === 'generating' ? 'Generating…' : 'Generate image'}
+              {status === 'generating'
+                ? genProgress || 'Generating…'
+                : 'Generate image'}
             </button>
             <button
               type='button'
@@ -598,6 +657,14 @@ export default function App() {
             >
               Reset all settings
             </button>
+            {genError && (
+              <p
+                className='border-border bg-danger-bg text-danger rounded-lg border px-3 py-2.5 text-[13px] leading-relaxed'
+                role='alert'
+              >
+                {genError}
+              </p>
+            )}
           </div>
         </aside>
 
@@ -623,8 +690,20 @@ export default function App() {
                     Generating…
                   </strong>
                   <p className='m-0 text-sm'>
-                    Sending your prompt to {model?.name ?? 'the model'}. Real
-                    calls will go through Flask.
+                    {genProgress ||
+                      `Sending your prompt to ${model?.name ?? 'the model'}…`}
+                  </p>
+                </div>
+              ) : status === 'error' ? (
+                <div
+                  className='text-muted max-w-105 p-10 text-center'
+                  role='alert'
+                >
+                  <strong className='text-danger mb-1.5 block text-[17px]'>
+                    Generation failed
+                  </strong>
+                  <p className='m-0 text-sm'>
+                    {genError || 'Something went wrong. Try again.'}
                   </p>
                 </div>
               ) : current ? (
@@ -671,7 +750,7 @@ export default function App() {
                   <a
                     className={btnCls}
                     href={current.src}
-                    download={`photopik-${current.id}.svg`}
+                    download={`photopik-${current.id}.${current.format}`}
                   >
                     Download
                   </a>
