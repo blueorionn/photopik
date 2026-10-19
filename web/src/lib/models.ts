@@ -1,73 +1,48 @@
-export interface ImageModel {
-  id: string
-  name: string
-  provider: string
-  supportsNegativePrompt: boolean
-  supportsSeed: boolean
-  supportsQuality: boolean
+import type { ImageModel } from '../types/models'
+
+export interface ModelCapabilities {
+  aspectRatios: string[]
   resolutions: string[]
+  supportsSeed: boolean
+  supportsNegativePrompt: boolean
+  qualityValues: string[]
   maxImages: number
   formats: string[]
-  note: string
 }
 
-export const IMAGE_MODELS: ImageModel[] = [
-  {
-    id: 'openai/gpt-image-2',
-    name: 'GPT Image 2',
-    provider: 'OpenAI',
-    supportsNegativePrompt: false,
-    supportsSeed: false,
-    supportsQuality: true,
-    resolutions: ['1K', '2K'],
-    maxImages: 4,
-    formats: ['png', 'jpeg', 'webp'],
-    note: 'Strong prompt following. No seed / negative prompt.',
-  },
-  {
-    id: 'bytedance-seed/seedream-4.5',
-    name: 'Seedream 4.5',
-    provider: 'ByteDance',
-    supportsNegativePrompt: true,
-    supportsSeed: true,
-    supportsQuality: false,
-    resolutions: ['1K', '2K', '4K'],
-    maxImages: 4,
-    formats: ['png', 'jpeg'],
-    note: 'Seed and negative prompt supported.',
-  },
-  {
-    id: 'black-forest-labs/flux.1-dev',
-    name: 'FLUX.1 Dev (router)',
-    provider: 'Black Forest Labs',
-    supportsNegativePrompt: true,
-    supportsSeed: true,
-    supportsQuality: false,
-    resolutions: ['1K', '2K'],
-    maxImages: 4,
-    formats: ['png', 'jpeg', 'webp'],
-    note: 'Router-hosted FLUX. Not your local GPU model.',
-  },
-  {
-    id: 'google/gemini-image',
-    name: 'Gemini Image',
-    provider: 'Google',
-    supportsNegativePrompt: false,
-    supportsSeed: false,
-    supportsQuality: true,
-    resolutions: ['1K', '2K'],
-    maxImages: 4,
-    formats: ['png', 'jpeg'],
-    note: 'Quality tiers supported. No seed.',
-  },
-]
+export const DEFAULT_MODEL_ID = 'qwen/qwen-image-2.1-turbo'
 
-export const ASPECT_RATIOS = [
-  '1:1',
-  '16:9',
-  '9:16',
-  '4:3',
-  '3:4',
-  '3:2',
-  '2:3',
-] as const
+function enumValues(
+  params: ImageModel['supported_parameters'],
+  key: string
+): string[] {
+  const param = params[key]
+  if (!param || param.type !== 'enum') return []
+  return param.values.map(String)
+}
+
+export function deriveCapabilities(model: ImageModel): ModelCapabilities {
+  const params = model.supported_parameters
+  const nParam = params['n']
+  const formats = enumValues(params, 'output_format')
+  return {
+    aspectRatios: enumValues(params, 'aspect_ratio'),
+    resolutions: enumValues(params, 'resolution'),
+    supportsSeed: params['seed']?.type === 'boolean',
+    supportsNegativePrompt: 'negative_prompt' in params,
+    qualityValues: enumValues(params, 'quality'),
+    maxImages:
+      nParam?.type === 'range' ? Math.max(1, Math.floor(nParam.max)) : 1,
+    formats: formats.length > 0 ? formats : ['png'],
+  }
+}
+
+export const FALLBACK_CAPABILITIES: ModelCapabilities = {
+  aspectRatios: ['1:1'],
+  resolutions: ['1K'],
+  supportsSeed: false,
+  supportsNegativePrompt: false,
+  qualityValues: [],
+  maxImages: 1,
+  formats: ['png'],
+}

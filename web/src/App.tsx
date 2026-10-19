@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ASPECT_RATIOS, IMAGE_MODELS } from './lib/models'
+import { fetchTextToImageModels, API_BASE_URL } from './lib/api'
+import {
+  DEFAULT_MODEL_ID,
+  FALLBACK_CAPABILITIES,
+  deriveCapabilities,
+} from './lib/models'
 import { dimensionsFor, demoImage } from './utils/image'
 import { type HistoryItem } from './types/history'
+import type { ImageModel } from './types/models'
 import { Sun, Moon } from 'lucide-react'
 
 const SETTINGS_KEY = 'photopik-settings'
@@ -26,10 +32,12 @@ export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   )
-  const [keyError, setKeyError] = useState('')
-  const [modelId, setModelId] = useState(() =>
-    typeof saved.modelId === 'string' ? saved.modelId : IMAGE_MODELS[0].id
-  )
+  const [models, setModels] = useState<ImageModel[]>([])
+  const [modelsStatus, setModelsStatus] = useState<
+    'loading' | 'ready' | 'error'
+  >('loading')
+  const [modelsReload, setModelsReload] = useState(0)
+  const [modelId, setModelId] = useState('')
   const [prompt, setPrompt] = useState(() =>
     typeof saved.prompt === 'string' ? saved.prompt : ''
   )
@@ -56,9 +64,35 @@ export default function App() {
   const [history, setHistory] = useState<HistoryItem[]>([])
 
   const model = useMemo(
-    () => IMAGE_MODELS.find((m) => m.id === modelId) ?? IMAGE_MODELS[0],
-    [modelId]
+    () => models.find((m) => m.id === modelId),
+    [models, modelId]
   )
+  const caps = useMemo(
+    () => (model ? deriveCapabilities(model) : FALLBACK_CAPABILITIES),
+    [model]
+  )
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchTextToImageModels(controller.signal)
+      .then((list) => {
+        setModels(list)
+        setModelsStatus('ready')
+        const savedId = typeof saved.modelId === 'string' ? saved.modelId : ''
+        const pick =
+          list.find((m) => m.id === savedId)?.id ??
+          list.find((m) => m.id === DEFAULT_MODEL_ID)?.id ??
+          list[0]?.id ??
+          ''
+        if (pick) changeModel(pick, list)
+      })
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setModelsStatus('error')
+      })
+    return () => controller.abort()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelsReload])
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -66,25 +100,40 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
+    if (!modelId) return
     localStorage.setItem(
       SETTINGS_KEY,
       JSON.stringify({ prompt, modelId, aspect, resolution })
     )
   }, [prompt, modelId, aspect, resolution])
 
-  function changeModel(id: string) {
-    const next = IMAGE_MODELS.find((m) => m.id === id) ?? IMAGE_MODELS[0]
+  function changeModel(id: string, list: ImageModel[] = models) {
+    const next = list.find((m) => m.id === id)
+    if (!next) return
+    const nextCaps = deriveCapabilities(next)
     setModelId(id)
-    if (!next.resolutions.includes(resolution)) {
-      setResolution(next.resolutions[0])
-      if (!customSize) {
-        const d = dimensionsFor(aspect, next.resolutions[0])
-        setWidth(d.width)
-        setHeight(d.height)
-      }
+    const nextAspect = nextCaps.aspectRatios.includes(aspect)
+      ? aspect
+      : (nextCaps.aspectRatios.find((r) => r === '1:1') ??
+        nextCaps.aspectRatios[0] ??
+        '1:1')
+    const nextResolution = nextCaps.resolutions.includes(resolution)
+      ? resolution
+      : (nextCaps.resolutions[0] ?? '1K')
+    if (nextAspect !== aspect) setAspect(nextAspect)
+    if (nextResolution !== resolution) setResolution(nextResolution)
+    if (!customSize) {
+      const d = dimensionsFor(nextAspect, nextResolution)
+      setWidth(d.width)
+      setHeight(d.height)
     }
-    if (count > next.maxImages) setCount(next.maxImages)
-    if (!next.formats.includes(format)) setFormat(next.formats[0])
+    if (count > nextCaps.maxImages) setCount(nextCaps.maxImages)
+    if (!nextCaps.formats.includes(format)) setFormat(nextCaps.formats[0])
+    if (
+      nextCaps.qualityValues.length > 0 &&
+      !nextCaps.qualityValues.includes(quality)
+    )
+      setQuality(nextCaps.qualityValues[0])
   }
 
   function changeAspect(value: string) {
@@ -104,6 +153,10 @@ export default function App() {
   }
 
   function generate() {
+    if (!model) {
+      setPromptError('No model loaded yet. Wait for models to load, or retry.')
+      return
+    }
     if (!prompt.trim()) {
       setPromptError('Prompt is required. Describe the image you want.')
       return
@@ -117,7 +170,7 @@ export default function App() {
         id: Date.now(),
         src: demoImage(prompt, usedSeed, width, height),
         prompt: prompt.trim(),
-        model: model.id,
+        model: modelId,
         seed: usedSeed,
         width,
         height,
@@ -201,21 +254,9 @@ export default function App() {
         >
           <section className='flex flex-col gap-2.5' aria-labelledby='conn-h'>
             <h2 id='conn-h' className='m-0 text-sm font-bold'>
-              OpenRouter{' '}
-              <span className='text-muted font-normal'>connection</span>
+              Model{' '}
+              <span className='text-muted font-normal'>via OpenRouter</span>
             </h2>
-            <div className={fieldCls}>
-              <label htmlFor='base-url' className={labelCls}>
-                Base URL
-              </label>
-              <input
-                id='base-url'
-                type='text'
-                value='https://openrouter.ai/api/v1'
-                readOnly
-                className={inputCls}
-              />
-            </div>
             <div className={fieldCls}>
               <label htmlFor='model' className={labelCls}>
                 Model
@@ -223,19 +264,47 @@ export default function App() {
               <select
                 id='model'
                 value={modelId}
+                disabled={modelsStatus !== 'ready'}
                 onChange={(e) => changeModel(e.target.value)}
                 className={inputCls}
               >
-                {IMAGE_MODELS.map((m) => (
+                {models.map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name} — {m.provider}
+                    {m.name}
                   </option>
                 ))}
               </select>
-              <small className={hintCls}>
-                {model.note} Model list is curated for now; live discovery comes
-                with the backend.
-              </small>
+              {modelsStatus === 'loading' ? (
+                <small className={hintCls}>
+                  Loading models from the API server…
+                </small>
+              ) : modelsStatus === 'error' ? (
+                <>
+                  <small className='text-danger text-xs' role='alert'>
+                    Could not load models from {API_BASE_URL}/models. Is the API
+                    server running?
+                  </small>
+                  <button
+                    type='button'
+                    className={btnCls}
+                    onClick={() => {
+                      setModelsStatus('loading')
+                      setModelsReload((n) => n + 1)
+                    }}
+                  >
+                    Retry
+                  </button>
+                </>
+              ) : model ? (
+                <small className={hintCls}>
+                  {model.description.slice(0, 160)}
+                  {model.description.length > 160 ? '…' : ''}
+                </small>
+              ) : (
+                <small className={hintCls}>
+                  No models returned by the API server.
+                </small>
+              )}
             </div>
           </section>
 
@@ -275,15 +344,15 @@ export default function App() {
                 id='negative'
                 rows={2}
                 value={negativePrompt}
-                disabled={!model.supportsNegativePrompt}
+                disabled={!caps.supportsNegativePrompt}
                 placeholder='blurry, low quality, distorted hands'
                 onChange={(e) => setNegativePrompt(e.target.value)}
                 className={`${inputCls} resize-y`}
               />
               <small className={hintCls}>
-                {model.supportsNegativePrompt
+                {caps.supportsNegativePrompt
                   ? 'Things the model should avoid.'
-                  : `${model.name} does not support a negative prompt, so this is disabled.`}
+                  : `${model?.name ?? 'This model'} does not declare negative prompt support, so this is disabled.`}
               </small>
             </div>
           </section>
@@ -299,7 +368,7 @@ export default function App() {
                 role='group'
                 aria-label='Aspect ratio'
               >
-                {ASPECT_RATIOS.map((r) => (
+                {caps.aspectRatios.map((r) => (
                   <button
                     key={r}
                     type='button'
@@ -319,7 +388,7 @@ export default function App() {
                 role='group'
                 aria-label='Resolution'
               >
-                {model.resolutions.map((r) => (
+                {caps.resolutions.map((r) => (
                   <button
                     key={r}
                     type='button'
@@ -342,7 +411,7 @@ export default function App() {
                 role='group'
                 aria-label='Output format'
               >
-                {model.formats.map((f) => (
+                {caps.formats.map((f) => (
                   <button
                     key={f}
                     type='button'
@@ -375,7 +444,7 @@ export default function App() {
                 <button
                   type='button'
                   aria-label='Increase count'
-                  onClick={() => setCount(Math.min(model.maxImages, count + 1))}
+                  onClick={() => setCount(Math.min(caps.maxImages, count + 1))}
                   className='border-border bg-background hover:border-accent h-8.5 w-8.5 rounded-lg border text-[17px]'
                 >
                   +
@@ -401,14 +470,14 @@ export default function App() {
                     id='seed'
                     type='number'
                     value={seed}
-                    disabled={randomSeedOn || !model.supportsSeed}
+                    disabled={randomSeedOn || !caps.supportsSeed}
                     onChange={(e) => setSeed(Number(e.target.value))}
                     className={inputCls}
                   />
                   <button
                     type='button'
                     className={btnCls}
-                    disabled={!model.supportsSeed}
+                    disabled={!caps.supportsSeed}
                     onClick={() => {
                       setSeed(randomSeed())
                       setRandomSeedOn(false)
@@ -421,18 +490,18 @@ export default function App() {
                   <input
                     type='checkbox'
                     checked={randomSeedOn}
-                    disabled={!model.supportsSeed}
+                    disabled={!caps.supportsSeed}
                     onChange={(e) => setRandomSeedOn(e.target.checked)}
                   />
                   New random seed every run
                 </label>
                 <small className={hintCls}>
-                  {model.supportsSeed
+                  {caps.supportsSeed
                     ? 'Same prompt + same seed reproduces the same image.'
-                    : `${model.name} does not expose a seed, so this is disabled.`}
+                    : `${model?.name ?? 'This model'} does not expose a seed, so this is disabled.`}
                 </small>
               </div>
-              {model.supportsQuality && (
+              {caps.qualityValues.length > 0 && (
                 <div className={fieldCls}>
                   <label className={labelCls}>Quality</label>
                   <div
@@ -440,7 +509,7 @@ export default function App() {
                     role='group'
                     aria-label='Quality'
                   >
-                    {['auto', 'low', 'medium', 'high'].map((q) => (
+                    {caps.qualityValues.map((q) => (
                       <button
                         key={q}
                         type='button'
@@ -554,8 +623,8 @@ export default function App() {
                     Generating…
                   </strong>
                   <p className='m-0 text-sm'>
-                    Sending your prompt to {model.name}. Real calls will go
-                    through Flask.
+                    Sending your prompt to {model?.name ?? 'the model'}. Real
+                    calls will go through Flask.
                   </p>
                 </div>
               ) : current ? (
