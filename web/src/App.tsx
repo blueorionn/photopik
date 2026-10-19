@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ASPECT_RATIOS, IMAGE_MODELS, demoImage, dimensionsFor } from './models'
+import { Sun, Moon } from 'lucide-react'
 
 interface HistoryItem {
   id: number
@@ -179,15 +180,17 @@ const fieldCls = 'flex flex-col gap-1.5'
           <img src="/photopik.svg" alt="" className="h-8 w-8" />
           <div>
             <strong className="block text-[19px] leading-tight tracking-tight">Photopik</strong>
-            <span className="text-xs text-muted">Text to image · OpenRouter</span>
           </div>
         </div>
         <div className="flex items-center gap-2.5">
-          <span className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold ${connected ? 'border-accent text-accent-hover' : 'border-border bg-surface'}`}>
-            {connected ? 'Key configured' : 'Demo mode — no key'}
-          </span>
-          <button type="button" className={btnCls} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+          <button
+            type="button"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded border border-border bg-surface text-muted transition-colors duration-200 hover:border-accent hover:bg-accent hover:text-white active:scale-95 [&_svg]:h-4.5 [&_svg]:w-4.5"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            {theme === 'dark' ? <Sun /> : <Moon />}
           </button>
         </div>
       </header>
