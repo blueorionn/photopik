@@ -25,9 +25,11 @@ export function deriveCapabilities(model: ImageModel): ModelCapabilities {
   const params = model.supported_parameters
   const nParam = params['n']
   const formats = enumValues(params, 'output_format')
+  const aspectRatios = enumValues(params, 'aspect_ratio')
+  const resolutions = enumValues(params, 'resolution')
   return {
-    aspectRatios: enumValues(params, 'aspect_ratio'),
-    resolutions: enumValues(params, 'resolution'),
+    aspectRatios: aspectRatios.length > 0 ? aspectRatios : ['1:1'],
+    resolutions: resolutions.length > 0 ? resolutions : ['1K'],
     supportsSeed: params['seed']?.type === 'boolean',
     supportsNegativePrompt: 'negative_prompt' in params,
     qualityValues: enumValues(params, 'quality'),

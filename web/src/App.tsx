@@ -13,7 +13,7 @@ import { dimensionsFor } from './utils/image'
 import { type HistoryItem } from './types/history'
 import type { ImageModel } from './types/models'
 import { randomSeed } from './utils/base'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, ChevronDown } from 'lucide-react'
 
 const SETTINGS_KEY = 'photopik-settings'
 
@@ -50,8 +50,20 @@ export default function App() {
     typeof saved.resolution === 'string' ? saved.resolution : '1K'
   )
   const [customSize, setCustomSize] = useState(false)
-  const [width, setWidth] = useState(1024)
-  const [height, setHeight] = useState(1024)
+  const [width, setWidth] = useState(
+    () =>
+      dimensionsFor(
+        typeof saved.aspect === 'string' ? saved.aspect : '1:1',
+        typeof saved.resolution === 'string' ? saved.resolution : '1K'
+      ).width
+  )
+  const [height, setHeight] = useState(
+    () =>
+      dimensionsFor(
+        typeof saved.aspect === 'string' ? saved.aspect : '1:1',
+        typeof saved.resolution === 'string' ? saved.resolution : '1K'
+      ).height
+  )
   const [seed, setSeed] = useState(randomSeed)
   const [randomSeedOn, setRandomSeedOn] = useState(true)
   const [count, setCount] = useState(1)
@@ -266,6 +278,11 @@ export default function App() {
     setSeed(item.seed)
     setRandomSeedOn(false)
     setFormat(item.format)
+    // History items store exact dimensions, not aspect/resolution.
+    // Keep them as a custom size so the preview matches the image.
+    setWidth(item.width)
+    setHeight(item.height)
+    setCustomSize(true)
     setStatus('done')
   }
 
@@ -279,6 +296,8 @@ export default function App() {
   const segCls = (active: boolean) =>
     `rounded-md border px-2.5 py-1.5 text-[13px] font-semibold ${active ? 'border-accent bg-accent text-white' : 'border-border bg-background hover:border-accent'}`
   const fieldCls = 'flex flex-col gap-1.5'
+  const selectCls =
+    'w-full cursor-pointer appearance-none rounded-lg border border-border bg-surface py-2 pr-9 pl-3 text-sm font-medium shadow-sm transition-colors hover:border-accent focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:opacity-55'
 
   return (
     <div className='flex min-h-screen flex-col'>
@@ -318,19 +337,25 @@ export default function App() {
               <label htmlFor='model' className={labelCls}>
                 Model
               </label>
-              <select
-                id='model'
-                value={modelId}
-                disabled={modelsStatus !== 'ready'}
-                onChange={(e) => changeModel(e.target.value)}
-                className={inputCls}
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
+              <div className='relative'>
+                <select
+                  id='model'
+                  value={modelId}
+                  disabled={modelsStatus !== 'ready'}
+                  onChange={(e) => changeModel(e.target.value)}
+                  className={selectCls}
+                >
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className='text-muted pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2'
+                  aria-hidden='true'
+                />
+              </div>
               {modelsStatus === 'loading' ? (
                 <small className={hintCls}>
                   Loading models from the API server…
@@ -397,6 +422,11 @@ export default function App() {
               <label htmlFor='negative' className={labelCls}>
                 Negative prompt <em>optional</em>
               </label>
+              <small className={hintCls}>
+                {caps.supportsNegativePrompt
+                  ? 'Things the model should avoid.'
+                  : `${model?.name ?? 'This model'} does not declare negative prompt support, so this is disabled.`}
+              </small>
               <textarea
                 id='negative'
                 rows={2}
@@ -406,83 +436,14 @@ export default function App() {
                 onChange={(e) => setNegativePrompt(e.target.value)}
                 className={`${inputCls} resize-y`}
               />
-              <small className={hintCls}>
-                {caps.supportsNegativePrompt
-                  ? 'Things the model should avoid.'
-                  : `${model?.name ?? 'This model'} does not declare negative prompt support, so this is disabled.`}
-              </small>
             </div>
           </section>
 
-          <section className='flex flex-col gap-2.5' aria-labelledby='size-h'>
-            <h2 id='size-h' className='m-0 text-sm font-bold'>
-              Size &amp; output
+          <section className='flex flex-col gap-2.5' aria-labelledby='count-h'>
+            <h2 id='count-h' className='m-0 text-sm font-bold'>
+              Image count
             </h2>
             <div className={fieldCls}>
-              <label className={labelCls}>Aspect ratio</label>
-              <div
-                className='flex flex-wrap gap-1.5'
-                role='group'
-                aria-label='Aspect ratio'
-              >
-                {caps.aspectRatios.map((r) => (
-                  <button
-                    key={r}
-                    type='button'
-                    aria-pressed={aspect === r && !customSize}
-                    onClick={() => changeAspect(r)}
-                    className={segCls(aspect === r && !customSize)}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className={fieldCls}>
-              <label className={labelCls}>Resolution</label>
-              <div
-                className='flex flex-wrap gap-1.5'
-                role='group'
-                aria-label='Resolution'
-              >
-                {caps.resolutions.map((r) => (
-                  <button
-                    key={r}
-                    type='button'
-                    aria-pressed={resolution === r && !customSize}
-                    onClick={() => changeResolution(r)}
-                    className={segCls(resolution === r && !customSize)}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-              <small className={hintCls}>
-                Output size: {width} × {height}px
-              </small>
-            </div>
-            <div className={fieldCls}>
-              <label className={labelCls}>Output format</label>
-              <div
-                className='flex flex-wrap gap-1.5'
-                role='group'
-                aria-label='Output format'
-              >
-                {caps.formats.map((f) => (
-                  <button
-                    key={f}
-                    type='button'
-                    aria-pressed={format === f}
-                    onClick={() => setFormat(f)}
-                    className={segCls(format === f)}
-                  >
-                    {f.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className={fieldCls}>
-              <label className={labelCls}>Image count</label>
               <div className='flex items-center gap-2.5'>
                 <button
                   type='button'
@@ -510,6 +471,92 @@ export default function App() {
               <small className={hintCls}>
                 Variants per run. More images cost more on OpenRouter.
               </small>
+            </div>
+          </section>
+
+          <section className='flex flex-col gap-2.5' aria-labelledby='size-h'>
+            <h2 id='size-h' className='m-0 text-sm font-bold'>
+              Size &amp; output
+            </h2>
+            <div className='grid grid-cols-2 gap-3'>
+              <div className={fieldCls}>
+                <label htmlFor='aspect-ratio' className={labelCls}>
+                  Aspect ratio
+                </label>
+                <div className='relative'>
+                  <select
+                    id='aspect-ratio'
+                    value={aspect}
+                    onChange={(e) => changeAspect(e.target.value)}
+                    className={selectCls}
+                  >
+                    {caps.aspectRatios.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className='text-muted pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2'
+                    aria-hidden='true'
+                  />
+                </div>
+              </div>
+              <div className={fieldCls}>
+                <label htmlFor='resolution' className={labelCls}>
+                  Resolution
+                </label>
+                <div className='relative'>
+                  <select
+                    id='resolution'
+                    value={resolution}
+                    onChange={(e) => changeResolution(e.target.value)}
+                    className={selectCls}
+                  >
+                    {caps.resolutions.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className='text-muted pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2'
+                    aria-hidden='true'
+                  />
+                </div>
+              </div>
+              <div className={fieldCls}>
+                <label htmlFor='output-format' className={labelCls}>
+                  Output format
+                </label>
+                <div className='relative'>
+                  <select
+                    id='output-format'
+                    value={format}
+                    onChange={(e) => setFormat(e.target.value)}
+                    className={selectCls}
+                  >
+                    {caps.formats.map((f) => (
+                      <option key={f} value={f}>
+                        {f.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className='text-muted pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2'
+                    aria-hidden='true'
+                  />
+                </div>
+              </div>
+              <div className='flex items-end'>
+                <p className='border-border bg-surface text-muted m-0 w-full rounded-lg border px-3 py-2 text-xs'>
+                  Output size:{' '}
+                  <span className='text-foreground font-mono font-semibold'>
+                    {width} × {height}px
+                  </span>
+                  {customSize && ' · custom'}
+                </p>
+              </div>
             </div>
           </section>
 
@@ -724,7 +771,7 @@ export default function App() {
                 </div>
               )}
             </div>
-            {current && status !== 'generating' && (
+            {current && status === 'done' && (
               <>
                 <p className='text-muted m-0 text-sm'>{current.prompt}</p>
                 <div
