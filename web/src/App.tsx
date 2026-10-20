@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   fetchTextToImageModels,
   generateImage as generateImageFromApi,
@@ -77,6 +77,15 @@ export default function App() {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [genError, setGenError] = useState('')
   const [genProgress, setGenProgress] = useState('')
+  const previewRef = useRef<HTMLElement>(null)
+
+  // On stacked (mobile) layouts the preview sits below the whole form.
+  // Bring the finished result into view instead of leaving it buried.
+  useEffect(() => {
+    if (status !== 'done' && status !== 'error') return
+    if (window.innerWidth >= 1024) return
+    previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [status])
 
   const model = useMemo(
     () => models.find((m) => m.id === modelId),
@@ -287,21 +296,21 @@ export default function App() {
   }
 
   const inputCls =
-    'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:bg-surface disabled:text-muted'
+    'w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base disabled:bg-surface disabled:text-muted sm:py-2 sm:text-sm'
   const labelCls =
     'text-[13px] font-semibold [&_em]:font-normal [&_em]:not-italic [&_em]:text-muted'
   const hintCls = 'text-xs leading-relaxed text-muted'
   const btnCls =
     'shrink-0 rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-semibold hover:border-accent disabled:cursor-not-allowed disabled:opacity-55'
   const segCls = (active: boolean) =>
-    `rounded-md border px-2.5 py-1.5 text-[13px] font-semibold ${active ? 'border-accent bg-accent text-white' : 'border-border bg-background hover:border-accent'}`
+    `rounded-md border px-2.5 py-2 text-[13px] font-semibold ${active ? 'border-accent bg-accent text-white' : 'border-border bg-background hover:border-accent'}`
   const fieldCls = 'flex flex-col gap-1.5'
   const selectCls =
-    'w-full cursor-pointer appearance-none rounded-lg border border-border bg-surface py-2 pr-9 pl-3 text-sm font-medium shadow-sm transition-colors hover:border-accent focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:opacity-55'
+    'w-full cursor-pointer appearance-none rounded-lg border border-border bg-surface py-2.5 pr-9 pl-3 text-base font-medium shadow-sm transition-colors hover:border-accent focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:opacity-55 sm:py-2 sm:text-sm'
 
   return (
     <div className='flex min-h-screen flex-col'>
-      <header className='border-border bg-background sticky top-0 z-10 flex items-center justify-between gap-4 border-b px-5 py-3.5'>
+      <header className='border-border bg-background sticky top-0 z-10 flex items-center justify-between gap-3 border-b px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5'>
         <div className='flex items-center gap-3'>
           <img src='/photopik.svg' alt='' className='h-8 w-8' />
           <div>
@@ -325,7 +334,7 @@ export default function App() {
 
       <div className='grid flex-1 items-start lg:grid-cols-[390px_minmax(0,1fr)]'>
         <aside
-          className='border-border flex flex-col gap-6 overflow-y-auto border-b p-5 lg:sticky lg:top-16.25 lg:max-h-[calc(100vh-65px)] lg:border-r lg:border-b-0'
+          className='border-border flex flex-col gap-5 overflow-y-auto border-b p-4 sm:gap-6 sm:p-5 lg:sticky lg:top-16.25 lg:max-h-[calc(100vh-65px)] lg:border-r lg:border-b-0'
           aria-label='Generation settings'
         >
           <section className='flex flex-col gap-2.5' aria-labelledby='conn-h'>
@@ -449,7 +458,7 @@ export default function App() {
                   type='button'
                   aria-label='Decrease count'
                   onClick={() => setCount(Math.max(1, count - 1))}
-                  className='border-border bg-background hover:border-accent h-8.5 w-8.5 rounded-lg border text-[17px]'
+                  className='border-border bg-background hover:border-accent h-10 w-10 rounded-lg border text-[17px]'
                 >
                   −
                 </button>
@@ -463,7 +472,7 @@ export default function App() {
                   type='button'
                   aria-label='Increase count'
                   onClick={() => setCount(Math.min(caps.maxImages, count + 1))}
-                  className='border-border bg-background hover:border-accent h-8.5 w-8.5 rounded-lg border text-[17px]'
+                  className='border-border bg-background hover:border-accent h-10 w-10 rounded-lg border text-[17px]'
                 >
                   +
                 </button>
@@ -478,7 +487,7 @@ export default function App() {
             <h2 id='size-h' className='m-0 text-sm font-bold'>
               Size &amp; output
             </h2>
-            <div className='grid grid-cols-2 gap-3'>
+            <div className='grid grid-cols-1 gap-3 min-[480px]:grid-cols-2'>
               <div className={fieldCls}>
                 <label htmlFor='aspect-ratio' className={labelCls}>
                   Aspect ratio
@@ -715,18 +724,22 @@ export default function App() {
           </div>
         </aside>
 
-        <main className='flex min-w-0 flex-col gap-5 p-5'>
-          <section className='flex flex-col gap-3' aria-labelledby='preview-h'>
+        <main className='flex min-w-0 flex-col gap-5 p-4 sm:p-5'>
+          <section
+            ref={previewRef}
+            className='flex scroll-mt-20 flex-col gap-3'
+            aria-labelledby='preview-h'
+          >
             <h2 id='preview-h' className='m-0 text-sm font-bold'>
               Preview
             </h2>
             <div
-              className='border-border bg-surface flex min-h-85 items-center justify-center overflow-hidden rounded-xl border'
+              className='border-border bg-surface flex max-h-[75svh] min-h-64 items-center justify-center overflow-hidden rounded-xl border sm:min-h-85'
               style={{ aspectRatio: `${width} / ${height}` }}
             >
               {status === 'generating' ? (
                 <div
-                  className='text-muted max-w-105 p-10 text-center'
+                  className='text-muted max-w-105 p-6 text-center sm:p-10'
                   role='status'
                 >
                   <div
@@ -743,7 +756,7 @@ export default function App() {
                 </div>
               ) : status === 'error' ? (
                 <div
-                  className='text-muted max-w-105 p-10 text-center'
+                  className='text-muted max-w-105 p-6 text-center sm:p-10'
                   role='alert'
                 >
                   <strong className='text-danger mb-1.5 block text-[17px]'>
@@ -760,7 +773,7 @@ export default function App() {
                   className='block h-full w-full object-contain'
                 />
               ) : (
-                <div className='text-muted max-w-105 p-10 text-center'>
+                <div className='text-muted max-w-105 p-6 text-center sm:p-10'>
                   <strong className='text-foreground mb-1.5 block text-[17px]'>
                     No image yet
                   </strong>
@@ -826,7 +839,7 @@ export default function App() {
                 database yet.
               </p>
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-2.5'>
+              <div className='grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(120px,1fr))]'>
                 {history.map((item) => (
                   <button
                     key={item.id}
