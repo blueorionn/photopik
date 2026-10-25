@@ -12,8 +12,8 @@ def index():
 
 
 blueprint.add_url_rule(
-    "/openrouter/models", view_func=GetTextToImageModels.as_view("text_to_image_models")
+    "/models", view_func=GetTextToImageModels.as_view("text_to_image_models")
 )
 blueprint.add_url_rule(
-    "/openrouter/generate", view_func=GenerateBase64Image.as_view("generate_image")
+    "/generate", view_func=GenerateBase64Image.as_view("generate_image")
 )

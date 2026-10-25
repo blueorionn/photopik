@@ -4,13 +4,13 @@ import httpx
 from flask import request, jsonify, current_app
 from flask.views import MethodView
 
-from ..providers.openrouter import get_text_to_image_model_data, generate_image
+from ..providers.openrouter import list_text_to_image_models, generate_image
 
 
 class GetTextToImageModels(MethodView):
     async def get(self):
         try:
-            data = get_text_to_image_model_data()
+            data = list_text_to_image_models()
             return jsonify(data), 200
         except Exception:
             current_app.logger.exception("Failed to fetch text-to-image models")

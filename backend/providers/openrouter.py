@@ -13,7 +13,7 @@ _MODEL_CACHE: dict = {"data": None, "fetched_at": 0.0}
 _MODEL_CACHE_TTL = 600.0  # seconds
 
 
-def get_text_to_image_model_data():
+def list_text_to_image_models():
     """Fetch all text-to-image models and it's subsequent data available on OpenRouter.
 
     Returns:
@@ -50,7 +50,7 @@ def _supported_parameters(model_id: str) -> dict:
     """Declared supported_parameters for one model, {} if unknown/unavailable."""
 
     try:
-        for item in get_text_to_image_model_data():
+        for item in list_text_to_image_models():
             if item["id"] == model_id:
                 return item.get("supported_parameters") or {}
     except Exception:
