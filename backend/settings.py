@@ -12,7 +12,9 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
     # Database
-    DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3")
+    DATABASE_PATH = os.environ.get("DATABASE_URL", "sqlite:///db.sqlite")
+    # Media output
+    OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "output")
 
     # Openrouter key
     OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
