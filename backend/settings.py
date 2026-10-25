@@ -12,12 +12,18 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
     # Database
-    DATABASE_PATH = os.environ.get("DATABASE_URL", "sqlite:///db.sqlite")
+    DATABASE_PATH = os.environ.get(
+        "DATABASE_PATH", os.path.join(PROJECT_ROOT, "db.sqlite3")
+    )
     # Media output
-    OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "output")
+    OUTPUT_DIR = os.environ.get("OUTPUT_DIR", os.path.join(PROJECT_ROOT, "output"))
 
     # Openrouter key
     OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+    # local model
+    ENABLE_LOCAL_MODELS = (
+        os.environ.get("ENABLE_LOCAL_MODELS", "false").lower() == "true"
+    )
 
 
 class DevelopmentConfig(Config):
