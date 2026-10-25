@@ -1,0 +1,112 @@
+[
+  {
+    "id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "name": "Stable Diffusion 1.5",
+    "description": "Fast, light local model. Good first download.",
+    "size_gb": 4.0,
+    "min_vram_gb": 4,
+    "license": "CreativeML Open RAIL-M",
+    "default_steps": 30,
+    "default_guidance": 7.5,
+    "gated": false
+  },
+  {
+    "id": "stabilityai/stable-diffusion-xl-base-1.0",
+    "name": "Stable Diffusion XL Base 1.0",
+    "description": "Higher detail than SD 1.5, slower, needs more VRAM.",
+    "size_gb": 7.0,
+    "min_vram_gb": 6,
+    "license": "CreativeML Open RAIL++-M",
+    "default_steps": 30,
+    "default_guidance": 7.5,
+    "gated": false
+  },
+  {
+    "id": "Lykon/DreamShaper",
+    "name": "DreamShaper 8",
+    "description": "Versatile SD 1.5 fine-tune for illustration and scenes.",
+    "size_gb": 5.0,
+    "min_vram_gb": 4,
+    "license": "CreativeML Open RAIL-M",
+    "default_steps": 25,
+    "default_guidance": 7.0,
+    "gated": false
+  },
+  {
+    "id": "Lykon/dreamshaper-xl-1-0",
+    "name": "DreamShaper XL",
+    "description": "SDXL fine-tune with strong illustration quality.",
+    "size_gb": 7.0,
+    "min_vram_gb": 6,
+    "license": "CreativeML Open RAIL++-M",
+    "default_steps": 25,
+    "default_guidance": 7.0,
+    "gated": false
+  },
+  {
+    "id": "SG161222/Realistic_Vision_V5.1_noVAE",
+    "name": "Realistic Vision 5.1",
+    "description": "Photorealistic SD 1.5 fine-tune.",
+    "size_gb": 4.0,
+    "min_vram_gb": 4,
+    "license": "CreativeML Open RAIL-M",
+    "default_steps": 25,
+    "default_guidance": 7.0,
+    "gated": false
+  },
+  {
+    "id": "RunDiffusion/Juggernaut-XL-v9",
+    "name": "Juggernaut XL v9",
+    "description": "Popular photorealistic SDXL fine-tune.",
+    "size_gb": 7.0,
+    "min_vram_gb": 6,
+    "license": "CreativeML Open RAIL++-M",
+    "default_steps": 25,
+    "default_guidance": 6.5,
+    "gated": false
+  },
+  {
+    "id": "playgroundai/playground-v2.5-1024px-aesthetic",
+    "name": "Playground v2.5",
+    "description": "Aesthetic-focused 1024px model from Playground AI.",
+    "size_gb": 8.0,
+    "min_vram_gb": 8,
+    "license": "Playground v2.5 License",
+    "default_steps": 30,
+    "default_guidance": 3.0,
+    "gated": false
+  },
+  {
+    "id": "PixArt-alpha/PixArt-XL-2-1024-MS",
+    "name": "PixArt Alpha XL 2",
+    "description": "Efficient high-resolution transformer model.",
+    "size_gb": 5.0,
+    "min_vram_gb": 6,
+    "license": "CreativeML Open RAIL-M",
+    "default_steps": 20,
+    "default_guidance": 4.5,
+    "gated": false
+  },
+  {
+    "id": "stabilityai/stable-diffusion-3.5-medium",
+    "name": "Stable Diffusion 3.5 Medium",
+    "description": "Newer Stability model. Requires accepting its license on Hugging Face first.",
+    "size_gb": 5.0,
+    "min_vram_gb": 8,
+    "license": "Stability AI Community License",
+    "default_steps": 28,
+    "default_guidance": 4.5,
+    "gated": true
+  },
+  {
+    "id": "black-forest-labs/FLUX.1-schnell",
+    "name": "FLUX.1 Schnell",
+    "description": "Fast, high-quality FLUX model. Large download, needs a strong GPU.",
+    "size_gb": 23.0,
+    "min_vram_gb": 12,
+    "license": "Apache 2.0",
+    "default_steps": 4,
+    "default_guidance": 0.0,
+    "gated": false
+  }
+]

@@ -1,35 +1,39 @@
-"""Curated local-model catalog: display metadata only.
+"""Loader for the curated local-model catalog in ``data/``.
 
-This is not the source of truth for what is usable — the models
-directory on disk is. Entries here only improve presentation for
-well-known models (size, VRAM guidance, license, defaults). Any
-downloaded model not listed here still works with generic defaults.
+The catalog itself lives in ``data/local_models.json`` so it can be
+edited without touching code. This module only reads it. The file is
+display metadata, not the source of truth for usability — the
+models directory on disk decides what can actually run.
 """
 
 from __future__ import annotations
 
-LOCAL_MODEL_CATALOG: list[dict] = [
-    {
-        "id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
-        "name": "Stable Diffusion 1.5",
-        "description": "Fast, light local model. Good first download.",
-        "size_gb": 4.0,
-        "min_vram_gb": 4,
-        "license": "CreativeML Open RAIL-M",
-        "default_steps": 30,
-        "default_guidance": 7.5,
-    },
-    {
-        "id": "stabilityai/stable-diffusion-xl-base-1.0",
-        "name": "Stable Diffusion XL Base 1.0",
-        "description": "Higher detail, slower, needs more VRAM.",
-        "size_gb": 7.0,
-        "min_vram_gb": 6,
-        "license": "CreativeML Open RAIL++-M",
-        "default_steps": 30,
-        "default_guidance": 7.5,
-    },
-]
+import json
+from functools import lru_cache
+from pathlib import Path
+
+_CATALOG_PATH = Path(__file__).resolve().parents[2] / "data" / "local_models.json"
+
+
+@lru_cache(maxsize=1)
+def _load_catalog() -> tuple[dict, ...]:
+    try:
+        raw = json.loads(_CATALOG_PATH.read_text(encoding="utf-8"))
+    except OSError, ValueError:
+        return ()
+    if not isinstance(raw, list):
+        return ()
+    return tuple(entry for entry in raw if isinstance(entry, dict) and entry.get("id"))
+
+
+def load_local_model_catalog() -> list[dict]:
+    """Return the curated catalog entries from ``data/local_models.json``."""
+    return [dict(entry) for entry in _load_catalog()]
+
+
+# Backwards-compatible name: a fresh list copy on each access is not
+# possible with a plain attribute, so this is loaded once at import.
+LOCAL_MODEL_CATALOG: list[dict] = load_local_model_catalog()
 
 _CATALOG_BY_ID = {entry["id"]: entry for entry in LOCAL_MODEL_CATALOG}
 

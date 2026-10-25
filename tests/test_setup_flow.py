@@ -13,6 +13,16 @@ def _app(tmp_path):
     return create_app(config), config
 
 
+def test_catalog_loads_top_10_from_data_file():
+    from app.providers.catalog import LOCAL_MODEL_CATALOG, catalog_entry
+
+    assert len(LOCAL_MODEL_CATALOG) == 10
+    ids = [entry["id"] for entry in LOCAL_MODEL_CATALOG]
+    assert len(set(ids)) == 10
+    assert catalog_entry(ids[0])["name"]
+    assert catalog_entry("not/a-model") is None
+
+
 def test_setup_status_starts_unconfigured(tmp_path):
     app, _ = _app(tmp_path)
     data = app.test_client().get("/setup/status").get_json()

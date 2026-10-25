@@ -723,7 +723,7 @@ async function loadSetup() {
       const row = document.createElement('div')
       row.className = 'setup-row'
       const label = document.createElement('span')
-      label.textContent = `${entry.name} · ~${entry.size_gb} GB · ${entry.license}${downloaded ? ' · downloaded' : ''}`
+      label.textContent = `${entry.name} · ~${entry.size_gb} GB · ${entry.license}${entry.gated ? ' · gated' : ''}${downloaded ? ' · downloaded' : ''}`
       row.appendChild(label)
       const btn = document.createElement('button')
       btn.type = 'button'
