@@ -4,7 +4,7 @@ import httpx
 from flask import request, jsonify, current_app
 from flask.views import MethodView
 
-from .utils import get_text_to_image_model_data, generate_image
+from ..providers.openrouter import get_text_to_image_model_data, generate_image
 
 
 class GetTextToImageModels(MethodView):
