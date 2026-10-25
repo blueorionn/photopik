@@ -40,9 +40,9 @@ def setup_status() -> dict:
         free_gb = None
     state = settings_service.get_setup_state()
     local_ready = local_deps_installed() and len(models) > 0
-    if state in ("", "not_started") and (
-        settings_service.openrouter_configured() or local_ready
-    ):
+    # Readiness always wins: once either provider can generate,
+    # setup is complete regardless of how the user got there.
+    if settings_service.openrouter_configured() or local_ready:
         state = "ready"
     return {
         "state": state,

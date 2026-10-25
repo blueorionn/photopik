@@ -671,6 +671,17 @@ syncUI()
 loadModels()
 
 // --- First-run setup / provider settings ---
+function selectSetupChoice(choice) {
+  const isLocal = choice === 'local'
+  el('setup-openrouter-form').hidden = isLocal
+  el('setup-local-form').hidden = !isLocal
+  el('setup-choice-openrouter').classList.toggle('active', !isLocal)
+  el('setup-choice-local').classList.toggle('active', isLocal)
+  el('setup-choice-openrouter').setAttribute('aria-pressed', String(!isLocal))
+  el('setup-choice-local').setAttribute('aria-pressed', String(isLocal))
+}
+el('setup-choice-openrouter')?.addEventListener('click', () => selectSetupChoice('openrouter'))
+el('setup-choice-local')?.addEventListener('click', () => selectSetupChoice('local'))
 async function pollSetupJob(jobId, done) {
   const tick = async () => {
     try {
@@ -697,6 +708,7 @@ async function loadSetup() {
     const s = await r.json()
     const ready = s.openrouter_configured || s.local.ready
     panel.hidden = ready && s.state === 'ready'
+    document.body.style.overflow = panel.hidden ? '' : 'hidden'
     el('setup-status').textContent = s.openrouter_configured
       ? 'OpenRouter is configured. You can generate images.'
       : 'Choose OpenRouter or a local model to start generating.'
@@ -730,7 +742,7 @@ async function loadSetup() {
         const data = await res.json()
         if (!res.ok) { setupMsg(data.error || 'Download failed', true); return }
         setupMsg('Download started…', false)
-        pollSetupJob(data.job_id, () => { loadSetup(); if (state.source === 'local') loadModels() })
+        pollSetupJob(data.job_id, () => { state.source = 'local'; loadSetup(); loadModels() })
       })
       row.appendChild(btn)
       box.appendChild(row)
@@ -748,6 +760,7 @@ el('setup-save-key')?.addEventListener('click', async () => {
   if (!r.ok) { setupMsg(data.error || 'Could not save key', true); return }
   el('setup-api-key').value = ''
   setupMsg('OpenRouter key saved on the server.', false)
+  closeSetup()
   loadSetup(); loadModels()
 })
 el('setup-install-deps')?.addEventListener('click', async () => {
@@ -772,8 +785,11 @@ el('setup-download-custom')?.addEventListener('click', async () => {
   const data = await r.json().catch(() => ({}))
   if (!r.ok) { setupMsg(data.error || 'Download failed to start', true); return }
   setupMsg('Download started…', false)
-  pollSetupJob(data.job_id, () => { loadSetup(); if (state.source === 'local') loadModels() })
+  pollSetupJob(data.job_id, () => { state.source = 'local'; loadSetup(); loadModels() })
 })
-el('setup-dismiss')?.addEventListener('click', () => { el('setup-panel').hidden = true })
+function closeSetup() {
+  el('setup-panel').hidden = true
+  document.body.style.overflow = ''
+}
 loadSetup()
 

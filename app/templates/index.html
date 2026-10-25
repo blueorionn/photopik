@@ -22,18 +22,34 @@
     </div>
   </header>
 
-  <section class="setup-panel" id="setup-panel" aria-labelledby="setup-h" hidden>
-    <h2 id="setup-h" class="section-title">Set up Photopik</h2>
-    <p class="hint" id="setup-status">Checking setup…</p>
-    <div class="setup-grid">
-      <div class="field">
-        <label class="field-label" for="setup-api-key">Option 1 — OpenRouter</label>
+  <div class="setup-overlay" id="setup-panel" hidden>
+    <section class="setup-dialog" role="dialog" aria-modal="true" aria-labelledby="setup-h">
+      <div class="setup-head">
+        <div>
+          <h2 id="setup-h" class="setup-title">How do you want to generate images?</h2>
+          <p class="hint" id="setup-status">Checking setup…</p>
+        </div>
+      </div>
+
+      <div class="setup-choices" role="group" aria-label="Generation provider">
+        <button type="button" class="setup-choice active" id="setup-choice-openrouter" aria-pressed="true">
+          <strong>OpenRouter</strong>
+          <span>Use cloud models with an API key. Nothing large to download.</span>
+        </button>
+        <button type="button" class="setup-choice" id="setup-choice-local" aria-pressed="false">
+          <strong>Local model</strong>
+          <span>Run models on your own GPU. Large one-time downloads.</span>
+        </button>
+      </div>
+
+      <div class="field" id="setup-openrouter-form">
+        <label class="field-label" for="setup-api-key">OpenRouter API key</label>
         <input id="setup-api-key" type="password" class="input" placeholder="sk-or-..." autocomplete="off" />
         <small class="hint">Stored only on this server. Never sent back to the browser.</small>
-        <button type="button" class="btn" id="setup-save-key">Save OpenRouter key</button>
+        <button type="button" class="btn-generate" id="setup-save-key">Save and continue</button>
       </div>
-      <div class="field">
-        <label class="field-label">Option 2 — Local model</label>
+
+      <div class="field" id="setup-local-form" hidden>
         <small class="hint" id="setup-local-info">Checking local readiness…</small>
         <label class="check-label"><input type="checkbox" id="setup-consent-deps" /> I agree to download the ML dependencies (several GB)</label>
         <button type="button" class="btn" id="setup-install-deps">Install local dependencies</button>
@@ -43,10 +59,11 @@
         <label class="check-label"><input type="checkbox" id="setup-consent-license" /> I accept the selected model license</label>
         <button type="button" class="btn" id="setup-download-custom">Download custom model</button>
       </div>
-    </div>
-    <p class="error-text" id="setup-message" role="alert" hidden></p>
-    <button type="button" class="btn" id="setup-dismiss">Continue to generator</button>
-  </section>
+
+      <p class="error-text" id="setup-message" role="alert" hidden></p>
+      <p class="hint">Pick one option above to continue. You can change providers later in Settings.</p>
+    </section>
+  </div>
 
   <div class="layout">
     <aside class="sidebar" aria-label="Generation settings">

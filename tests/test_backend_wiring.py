@@ -68,6 +68,9 @@ def test_index_page_renders_jinja_ui(tmp_path):
     assert 'id="prompt"' in html
     assert 'id="preview-box"' in html
     assert 'id="history-grid"' in html
+    assert 'id="setup-panel"' in html
+    assert 'id="setup-choice-openrouter"' in html
+    assert 'id="setup-choice-local"' in html
     assert client.get("/static/css/app.css").status_code == 200
     assert client.get("/static/js/app.js").status_code == 200
     assert client.get("/static/photopik.svg").status_code == 200
