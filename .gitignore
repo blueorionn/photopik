@@ -79,4 +79,7 @@ Log.txt
 # Application Logs
 logs/
 *.log
+
+# Application output and hf models
 output/
+models/
