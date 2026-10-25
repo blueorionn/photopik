@@ -2,12 +2,12 @@
 
 import base64
 
-from backend import create_app
-from backend.db import GenerationRepository, create_engine_and_factory
-from backend.providers import registry
-from backend.providers.base import GenerationProvider
-from backend.settings import TestingConfig
-from backend.types.generation import GenerationRecord, GenerationResult
+from app import create_app
+from app.db import GenerationRepository, create_engine_and_factory
+from app.providers import registry
+from app.providers.base import GenerationProvider
+from app.settings import TestingConfig
+from app.types.generation import GenerationRecord, GenerationResult
 
 
 class _FakeProvider(GenerationProvider):
