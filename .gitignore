@@ -1,7 +1,6 @@
 # env files
 .env*
-!.env.dev.example
-!.env.prod.example
+!.env.example
 
 # web
 node_modules
