@@ -80,3 +80,4 @@ Log.txt
 # Application Logs
 logs/
 *.log
+output/
