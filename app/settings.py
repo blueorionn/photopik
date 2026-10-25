@@ -1,13 +1,20 @@
 """Application Configuration."""
 
 import os
-from .utils import generate_secret_key
+import secrets
+
+
+def _generate_secret_key():
+    """Generate a random string of 50 characters."""
+    chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
+    secret_len = 50
+    return "".join(secrets.choice(chars) for i in range(secret_len))
 
 
 class Config:
     """Base Configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY", generate_secret_key())
+    SECRET_KEY = os.environ.get("SECRET_KEY", _generate_secret_key())
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
