@@ -5,6 +5,10 @@ from flask import Flask, jsonify
 from .settings import config
 from .extensions import init_cors
 from .core.urls import blueprint as base_blueprint
+from .db import SQLiteLogHandler, create_engine_and_factory
+from .db.repositories import GenerationRepository
+from .services import GenerationService
+from .storage import save_image
 
 
 def create_app(config_object=config):
@@ -30,6 +34,34 @@ def register_extension(app: Flask):
     """Registering extensions."""
 
     init_cors(app)
+    init_database(app)
+
+
+def init_database(app: Flask):
+    """Create the DB engine, repositories, service, and log handler.
+
+    Built here, inside the factory, never at import time: Gunicorn's
+    ``preload_app`` must not fork a live engine into workers. SQLite
+    uses NullPool, so no connection is shared across the fork.
+    Objects are stashed on ``app.extensions`` for views to reach via
+    ``current_app.extensions``.
+    """
+    engine, factory = create_engine_and_factory(
+        database_path=app.config.get("DATABASE_PATH")
+    )
+    app.extensions["db_engine"] = engine
+    app.extensions["db_session_factory"] = factory
+    repository = GenerationRepository(factory)
+    app.extensions["generation_repository"] = repository
+    app.extensions["generation_service"] = GenerationService(
+        repository,
+        save_image=lambda data, fmt, gid: save_image(
+            data, fmt, gid, app.config.get("OUTPUT_DIR")
+        ),
+        logger=app.logger,
+    )
+    if not any(isinstance(h, SQLiteLogHandler) for h in app.logger.handlers):
+        app.logger.addHandler(SQLiteLogHandler(factory))
 
 
 def register_blueprints(app: Flask):

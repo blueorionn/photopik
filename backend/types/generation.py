@@ -96,9 +96,17 @@ class GenerationRecord(BaseModel):
     negative_prompt: str | None = None
     seed: int | None = None
     quality: str | None = None
+    # Local-provider only; None for OpenRouter generations.
+    steps: int | None = None
+    guidance: float | None = None
+    provider_request_id: str | None = None
     status: Status = "queued"
     error: str | None = None
     image_path: str | None = None
     duration_ms: float | None = None
     logged_at: datetime = Field(default_factory=_utcnow)
     finished_at: datetime | None = None
+    # Local-provider only. OpenRouter requests leave these as None.
+    steps: int | None = None
+    guidance: float | None = None
+    provider_request_id: str | None = None

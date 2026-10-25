@@ -45,6 +45,8 @@ def record_from_request(request: GenerationRequest) -> GenerationRecord:
         negative_prompt=request.negative_prompt,
         seed=request.seed,
         quality=request.quality,
+        steps=request.steps,
+        guidance=request.guidance,
         status="running",
     )
 

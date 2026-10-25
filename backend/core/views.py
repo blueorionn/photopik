@@ -1,75 +1,74 @@
+"""HTTP layer: parse, validate, map errors to status codes.
+
+All generation workflow lives in the generation service; all
+provider access goes through the registry. This module only turns
+JSON into a ``GenerationRequest``, calls the service, and turns
+exceptions into HTTP responses.
+"""
+
 import base64
 
 import httpx
-from flask import request, jsonify, current_app
+from flask import current_app, jsonify, request
 from flask.views import MethodView
+from pydantic import ValidationError
 
-from ..providers.openrouter import list_text_to_image_models, generate_image
+from ..providers.registry import (
+    ProviderUnavailableError,
+    UnknownProviderError,
+    get_provider,
+)
+from ..types.generation import GenerationRequest
 
 
 class GetTextToImageModels(MethodView):
-    async def get(self):
+    def get(self):
         try:
-            data = list_text_to_image_models()
-            return jsonify(data), 200
+            provider = get_provider("openrouter")
+            return jsonify(provider.list_models()), 200
+        except ProviderUnavailableError as exc:
+            current_app.logger.error("Model provider unavailable: %s", exc)
+            return jsonify({"error": str(exc)}), 503
         except Exception:
             current_app.logger.exception("Failed to fetch text-to-image models")
             return jsonify({"error": "Failed to fetch text-to-image models"}), 500
 
 
 class GenerateBase64Image(MethodView):
-    async def post(self):
-        # Optional POST /generate fields and the Python type each must have.
-        _OPTIONAL_FIELDS: dict[str, type | tuple[type, ...]] = {
-            "aspect_ratio": str,
-            "resolution": str,
-            "n": int,
-            "output_format": str,
-            "width": (int, type(None)),
-            "height": (int, type(None)),
-            "negative_prompt": (str, type(None)),
-            "seed": (int, type(None)),
-            "quality": (str, type(None)),
-        }
-
+    def post(self):
         data = request.get_json(silent=True)
-
-        if not data:
+        if not data or not isinstance(data, dict):
             return jsonify({"error": "Prompt and Model ID are required"}), 422
-        if not isinstance(data.get("prompt"), str) or not data["prompt"].strip():
-            return jsonify({"error": "A prompt is required"}), 400
-        elif not isinstance(data.get("model"), str) or not data["model"].strip():
-            return jsonify({"error": "Model ID is required"}), 400
 
-        # ---- Type checks for every optional field the frontend may send ----
-        kwargs: dict = {}
-        for field, expected in _OPTIONAL_FIELDS.items():
-            if field not in data:
-                continue
-            value = data[field]
-            # bool is a subclass of int in Python; never accept it as one.
-            if isinstance(value, bool) and expected is int:
-                return jsonify({"error": f"'{field}' must be an integer"}), 400
-            if not isinstance(value, expected):
-                return jsonify({"error": f"'{field}' has an invalid type"}), 400
-            kwargs[field] = value
-
-        # ---- Generate, mapping each failure to the right HTTP status ----
+        payload = dict(data)
+        payload.setdefault("source", "openrouter")
         try:
-            image_bytes = generate_image(
-                data["prompt"],
-                data["model"],
-                **kwargs,
-            )
+            gen_request = GenerationRequest.model_validate(payload)
+        except ValidationError as exc:
+            first = exc.errors()[0] if exc.errors() else {}
+            field = ".".join(str(p) for p in first.get("loc", []))
+            message = first.get("msg", "Invalid request")
+            detail = f"{field}: {message}" if field else message
+            return jsonify({"error": detail}), 400
+
+        service = current_app.extensions.get("generation_service")
+        if service is None:
+            current_app.logger.error("Generation service is not configured")
+            return jsonify({"error": "Generation is not configured"}), 500
+
+        try:
+            result = service.generate(gen_request)
+        except UnknownProviderError as exc:
+            return jsonify({"error": str(exc)}), 400
+        except ProviderUnavailableError as exc:
+            current_app.logger.error("Provider unavailable: %s", exc)
+            return jsonify({"error": str(exc)}), 503
         except ValueError as exc:
-            # Bad enum/range/dimension caught by utils validation.
             return jsonify({"error": str(exc)}), 400
         except RuntimeError as exc:
-            # e.g. OPENROUTER_API_KEY not configured. Server fault, not client's.
             current_app.logger.exception("Generation is misconfigured")
             return jsonify({"error": str(exc)}), 500
         except httpx.HTTPStatusError as exc:
-            # OpenRouter rejected the request; log detail, return 502.
             current_app.logger.error(
                 "OpenRouter error %s: %s",
                 exc.response.status_code,
@@ -87,6 +86,12 @@ class GenerateBase64Image(MethodView):
             return jsonify({"error": "Failed to generate image"}), 500
 
         return (
-            jsonify({"data": {"image": base64.b64encode(image_bytes).decode("utf-8")}}),
+            jsonify(
+                {
+                    "data": {
+                        "image": base64.b64encode(result.image_bytes).decode("utf-8")
+                    }
+                }
+            ),
             200,
         )
