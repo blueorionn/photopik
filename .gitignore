@@ -48,7 +48,7 @@ instance/
 
 # Databases (Local Development)
 *.db
-*.sqlite
+*.sqlite*
 *.sqlite3
 app.db
 
