@@ -2,9 +2,11 @@ import base64
 import time
 
 import httpx
-from flask import current_app
+from flask import current_app, has_app_context
 
+from ..types.generation import GenerationRequest, GenerationResult
 from ..types.image_model import ImageModel
+from .base import GenerationProvider
 
 OPENROUTER_IMAGES_URL = "https://openrouter.ai/api/v1/images"
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/images/models"
@@ -201,3 +203,77 @@ def generate_image(
         raise KeyError("Openrouter response contains no image data")
 
     return base64.b64decode(data[0]["b64_json"], validate=True)
+
+
+_MIMETYPES = {
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "webp": "image/webp",
+    "svg": "image/svg+xml",
+    "gif": "image/gif",
+}
+
+
+class OpenRouterProvider(GenerationProvider):
+    """Text-to-image generation via the OpenRouter Image API."""
+
+    name = "openrouter"
+
+    def is_available(self) -> bool:
+        if not has_app_context():
+            return False
+        return bool(current_app.config.get("OPENROUTER_API_KEY"))
+
+    def unavailable_reason(self) -> str | None:
+        if not self.is_available():
+            return (
+                "OPENROUTER_API_KEY is not configured on the server. "
+                "Set it in the backend environment; never in the browser."
+            )
+        return None
+
+    def list_models(self) -> list[dict]:
+        return list_text_to_image_models()
+
+    def generate(self, request: GenerationRequest) -> GenerationResult:
+        if request.source != self.name:
+            raise ValueError(
+                f"OpenRouterProvider cannot serve source '{request.source}'"
+            )
+
+        kwargs: dict = {
+            "aspect_ratio": request.aspect_ratio,
+            "resolution": request.resolution,
+            "n": request.n,
+            "output_format": request.output_format,
+            "negative_prompt": request.negative_prompt,
+            "seed": request.seed,
+            "quality": request.quality,
+        }
+        if request.width is not None:
+            kwargs["width"] = request.width
+        if request.height is not None:
+            kwargs["height"] = request.height
+
+        started = time.perf_counter()
+        image_bytes = generate_image(request.prompt, request.model, **kwargs)
+        duration_ms = (time.perf_counter() - started) * 1000
+
+        return GenerationResult(
+            source=self.name,
+            prompt=request.prompt,
+            model=request.model,
+            image_bytes=image_bytes,
+            mimetype=_MIMETYPES.get(
+                request.output_format.lower(), "application/octet-stream"
+            ),
+            aspect_ratio=request.aspect_ratio,
+            resolution=request.resolution,
+            n=request.n,
+            output_format=request.output_format,
+            width=request.width,
+            height=request.height,
+            seed=request.seed,
+            duration_ms=duration_ms,
+        )
