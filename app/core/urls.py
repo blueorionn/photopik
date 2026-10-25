@@ -3,8 +3,10 @@
 from flask import Blueprint
 from .pages import index
 from .views import GetTextToImageModels, GenerateBase64Image
+from .setup_views import blueprint as setup_blueprint
 
 blueprint = Blueprint("base", __name__)
+blueprint.register_blueprint(setup_blueprint)
 
 blueprint.add_url_rule("/", view_func=index)
 blueprint.add_url_rule(

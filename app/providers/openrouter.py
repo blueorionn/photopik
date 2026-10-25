@@ -137,9 +137,11 @@ def generate_image(
         if dim is not None and not (256 <= dim <= 4096):
             raise ValueError(f"{name} must be between 256 and 4096")
 
-    api_key = current_app.config["OPENROUTER_API_KEY"]
+    from ..services.settings_service import get_openrouter_api_key
+
+    api_key = get_openrouter_api_key()
     if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY is not configured on the server")
+        raise RuntimeError("OpenRouter API key is not configured on the server")
 
     supported = _supported_parameters(model)
     # Enum/range checks against THIS model's declared parameters.
@@ -223,13 +225,15 @@ class OpenRouterProvider(GenerationProvider):
     def is_available(self) -> bool:
         if not has_app_context():
             return False
-        return bool(current_app.config.get("OPENROUTER_API_KEY"))
+        from ..services.settings_service import openrouter_configured
+
+        return openrouter_configured()
 
     def unavailable_reason(self) -> str | None:
         if not self.is_available():
             return (
-                "OPENROUTER_API_KEY is not configured on the server. "
-                "Set it in the backend environment; never in the browser."
+                "OpenRouter API key is not configured. "
+                "Add it in Settings; never in the browser."
             )
         return None
 

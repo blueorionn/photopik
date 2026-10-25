@@ -18,12 +18,14 @@ class Config:
     # Media output
     OUTPUT_DIR = os.environ.get("OUTPUT_DIR", os.path.join(PROJECT_ROOT, "output"))
 
-    # Openrouter key
-    OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-    # local model
-    ENABLE_LOCAL_MODELS = (
-        os.environ.get("ENABLE_LOCAL_MODELS", "false").lower() == "true"
+    # Local model weights, discovered by scanning this directory.
+    LOCAL_MODELS_DIR = os.environ.get(
+        "LOCAL_MODELS_DIR", os.path.join(PROJECT_ROOT, "models")
     )
+
+    # Optional power-user override only. Normal setup stores the key
+    # server-side via the setup wizard; it is never required in .env.
+    OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 
 
 class DevelopmentConfig(Config):

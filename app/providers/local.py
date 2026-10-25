@@ -27,17 +27,11 @@ from .base import GenerationProvider
 _GPU_LOCK = threading.Lock()
 _PIPELINES: dict[str, object] = {}
 
-# Local catalogue: id is the Hugging Face repo used at load time.
-LOCAL_MODELS: dict[str, dict] = {
-    "stable-diffusion-v1-5/stable-diffusion-v1-5": {
-        "name": "Stable Diffusion 1.5 (local)",
-        "description": "Local SD 1.5 via diffusers. Fast on a 6 GB GPU.",
-    },
-    "stabilityai/stable-diffusion-xl-base-1.0": {
-        "name": "Stable Diffusion XL (local)",
-        "description": "Local SDXL base via diffusers. Slower, higher detail.",
-    },
-}
+# Display overlay for known models only. Usability is determined by
+# discovery in the models directory, never by this dict.
+from .catalog import LOCAL_MODEL_CATALOG
+
+LOCAL_MODELS: dict[str, dict] = {entry["id"]: entry for entry in LOCAL_MODEL_CATALOG}
 
 _ASPECT_RATIOS = ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"]
 _FORMATS = ["png", "jpeg", "webp"]
@@ -81,35 +75,35 @@ class LocalProvider(GenerationProvider):
     def is_available(self) -> bool:
         if not has_app_context():
             return False
-        if not current_app.config.get("ENABLE_LOCAL_MODELS"):
-            return False
         return find_spec("torch") is not None and find_spec("diffusers") is not None
 
     def unavailable_reason(self) -> str | None:
         if not has_app_context():
             return "Local models require an application context."
-        if not current_app.config.get("ENABLE_LOCAL_MODELS"):
-            return (
-                "Local models are disabled. Set ENABLE_LOCAL_MODELS=true "
-                "to enable them."
-            )
         if find_spec("torch") is None or find_spec("diffusers") is None:
             return (
                 "Local model dependencies are not installed. "
-                "Install them with: uv sync --extra local"
+                "Open Setup to install them."
             )
         return None
 
     def list_models(self) -> list[dict]:
-        return [
-            {
-                "id": model_id,
-                "name": meta["name"],
-                "description": meta["description"],
-                "supported_parameters": _supported_parameters(),
-            }
-            for model_id, meta in LOCAL_MODELS.items()
-        ]
+        from ..services.local_model_service import discover_models
+
+        models = []
+        for found in discover_models():
+            meta = LOCAL_MODELS.get(found["id"], {})
+            models.append(
+                {
+                    "id": found["id"],
+                    "name": meta.get("name", found["id"]),
+                    "description": meta.get(
+                        "description", "Local model discovered on disk."
+                    ),
+                    "supported_parameters": _supported_parameters(),
+                }
+            )
+        return models
 
     def _load_pipeline(self, model_id: str):
         """Load (and cache) a diffusers pipeline for ``model_id``."""
@@ -118,10 +112,14 @@ class LocalProvider(GenerationProvider):
         import torch
         from diffusers import DiffusionPipeline
 
+        from ..services.local_model_service import models_dir
+
+        local_path = models_dir() / model_id
+        source = str(local_path) if local_path.is_dir() else model_id
         device = "cuda" if torch.cuda.is_available() else "cpu"
         dtype = torch.float16 if device == "cuda" else torch.float32
         pipe = DiffusionPipeline.from_pretrained(
-            model_id, torch_dtype=dtype, safety_checker=None
+            source, torch_dtype=dtype, safety_checker=None
         )
         pipe = pipe.to(device)
         _PIPELINES[model_id] = pipe
@@ -130,10 +128,13 @@ class LocalProvider(GenerationProvider):
     def generate(self, request: GenerationRequest) -> GenerationResult:
         if request.source != self.name:
             raise ValueError(f"LocalProvider cannot serve source '{request.source}'")
-        if request.model not in LOCAL_MODELS:
-            known = ", ".join(sorted(LOCAL_MODELS))
+        from ..services.local_model_service import discover_models
+
+        discovered = [m["id"] for m in discover_models()]
+        if request.model not in discovered:
+            known = ", ".join(sorted(discovered)) or "none downloaded"
             raise ValueError(
-                f"Unknown local model '{request.model}'. Available: {known}"
+                f"Local model '{request.model}' is not downloaded. Available: {known}"
             )
         if request.n != 1:
             raise ValueError("Local provider generates one image per request")

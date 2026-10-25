@@ -19,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
 from ..types.generation import GenerationRecord
-from .models import AppLog, Generation
+from .models import AppLog, AppSetting, Generation
 
 
 def _utcnow() -> datetime:
@@ -179,6 +179,44 @@ class GenerationRepository:
         with self._factory() as session:
             rows = list(session.scalars(stmt))
             return [generation_to_record(row) for row in rows]
+
+
+class SettingsRepository:
+    """Persistence for ``app_settings`` key/value rows."""
+
+    def __init__(self, session_factory: sessionmaker[Session]) -> None:
+        self._factory = session_factory
+
+    def get(self, key: str, default: str | None = None) -> str | None:
+        with self._factory() as session:
+            row = session.get(AppSetting, key)
+            return row.value if row is not None else default
+
+    def set(self, key: str, value: str | None) -> None:
+        with self._factory() as session, session.begin():
+            row = session.get(AppSetting, key)
+            if row is None:
+                session.add(AppSetting(key=key, value=value))
+            else:
+                row.value = value
+
+    def delete(self, key: str) -> None:
+        with self._factory() as session, session.begin():
+            row = session.get(AppSetting, key)
+            if row is not None:
+                session.delete(row)
+
+    def get_json(self, key: str, default=None):
+        raw = self.get(key)
+        if not raw:
+            return default
+        try:
+            return json.loads(raw)
+        except ValueError:
+            return default
+
+    def set_json(self, key: str, value) -> None:
+        self.set(key, json.dumps(value))
 
 
 class AppLogRepository:

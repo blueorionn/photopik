@@ -50,8 +50,8 @@ function deriveCapabilities(model) {
   }
 }
 
-async function fetchTextToImageModels(signal) {
-  const response = await fetch(`${API_BASE_URL}/models`, { signal })
+async function fetchTextToImageModels(signal, source) {
+  const response = await fetch(`${API_BASE_URL}/models?source=${encodeURIComponent(source || 'openrouter')}`, { signal })
   if (!response.ok) throw new Error(`GET /models failed with ${response.status}`)
   const data = await response.json()
   if (!Array.isArray(data)) throw new Error('GET /models returned an unexpected shape')
@@ -102,6 +102,7 @@ const initialDims = dimensionsFor(initialAspect, initialResolution)
 
 const state = {
   theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+  source: 'openrouter',
   models: [],
   modelsStatus: 'loading',
   modelId: '',
@@ -127,6 +128,7 @@ const state = {
 
 const el = (id) => document.getElementById(id)
 const els = {
+  source: el('source'),
   themeToggle: el('theme-toggle'),
   themeSun: el('theme-icon-sun'),
   themeMoon: el('theme-icon-moon'),
@@ -252,6 +254,7 @@ function syncForm() {
 
   els.countValue.textContent = String(state.count)
 
+  if (els.source) els.source.value = state.source
   els.model.innerHTML = ''
   for (const m of state.models) {
     const opt = document.createElement('option')
@@ -455,6 +458,7 @@ async function generate() {
           {
             prompt: state.prompt.trim(),
             model: state.modelId,
+            source: state.source,
             ...(c.supportsNegativePrompt && state.negativePrompt.trim()
               ? { negative_prompt: state.negativePrompt.trim() }
               : {}),
@@ -555,7 +559,7 @@ function loadModels() {
   modelsController = controller
   state.modelsStatus = 'loading'
   syncUI()
-  fetchTextToImageModels(controller.signal)
+  fetchTextToImageModels(controller.signal, state.source)
     .then((list) => {
       state.models = list
       state.modelsStatus = 'ready'
@@ -582,6 +586,12 @@ els.themeToggle.addEventListener('click', () => {
   document.documentElement.classList.toggle('dark', state.theme === 'dark')
   localStorage.setItem('photopik-theme', state.theme)
   syncTheme()
+})
+els.source.addEventListener('change', (e) => {
+  state.source = e.target.value
+  state.models = []
+  state.modelId = ''
+  loadModels()
 })
 els.model.addEventListener('change', (e) => {
   changeModel(e.target.value)
@@ -659,4 +669,111 @@ els.resultReuseSeed.addEventListener('click', () => {
 
 syncUI()
 loadModels()
+
+// --- First-run setup / provider settings ---
+async function pollSetupJob(jobId, done) {
+  const tick = async () => {
+    try {
+      const r = await fetch(`${API_BASE_URL}/setup/jobs/${jobId}`)
+      const job = await r.json()
+      setupMsg(job.message || job.status, job.status === 'failed')
+      if (job.status === 'running') window.setTimeout(tick, 2000)
+      else if (done) done(job)
+    } catch { window.setTimeout(tick, 3000) }
+  }
+  tick()
+}
+function setupMsg(text, isError) {
+  const m = el('setup-message')
+  if (!m) return
+  m.hidden = !text
+  m.textContent = text || ''
+}
+async function loadSetup() {
+  const panel = el('setup-panel')
+  if (!panel) return
+  try {
+    const r = await fetch(`${API_BASE_URL}/setup/status`)
+    const s = await r.json()
+    const ready = s.openrouter_configured || s.local.ready
+    panel.hidden = ready && s.state === 'ready'
+    el('setup-status').textContent = s.openrouter_configured
+      ? 'OpenRouter is configured. You can generate images.'
+      : 'Choose OpenRouter or a local model to start generating.'
+    el('setup-local-info').textContent =
+      `Dependencies: ${s.local.deps_installed ? 'installed' : 'not installed'} · ` +
+      `Models folder: ${s.local.models_dir} · Free disk: ${s.local.disk_free_gb ?? '?'} GB` +
+      (s.local.gpu ? ` · GPU: ${s.local.gpu}` : '')
+    const box = el('setup-catalog')
+    box.innerHTML = ''
+    for (const entry of s.local.catalog || []) {
+      const downloaded = (s.local.models || []).some((m) => m.id === entry.id)
+      const row = document.createElement('div')
+      row.className = 'setup-row'
+      const label = document.createElement('span')
+      label.textContent = `${entry.name} · ~${entry.size_gb} GB · ${entry.license}${downloaded ? ' · downloaded' : ''}`
+      row.appendChild(label)
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'btn'
+      btn.textContent = downloaded ? 'Delete' : 'Download'
+      btn.addEventListener('click', async () => {
+        if (downloaded) {
+          await fetch(`${API_BASE_URL}/setup/local/models/${encodeURIComponent(entry.id)}`, { method: 'DELETE' })
+          loadSetup(); loadModels(); return
+        }
+        if (!el('setup-consent-license').checked) { setupMsg('Please accept the model license first.', true); return }
+        const res = await fetch(`${API_BASE_URL}/setup/local/models/download`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo_id: entry.id, accept_license: true }),
+        })
+        const data = await res.json()
+        if (!res.ok) { setupMsg(data.error || 'Download failed', true); return }
+        setupMsg('Download started…', false)
+        pollSetupJob(data.job_id, () => { loadSetup(); if (state.source === 'local') loadModels() })
+      })
+      row.appendChild(btn)
+      box.appendChild(row)
+    }
+  } catch { panel.hidden = false }
+}
+el('setup-save-key')?.addEventListener('click', async () => {
+  const key = el('setup-api-key').value.trim()
+  if (!key) { setupMsg('Paste your OpenRouter API key first.', true); return }
+  const r = await fetch(`${API_BASE_URL}/setup/openrouter`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ api_key: key }),
+  })
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) { setupMsg(data.error || 'Could not save key', true); return }
+  el('setup-api-key').value = ''
+  setupMsg('OpenRouter key saved on the server.', false)
+  loadSetup(); loadModels()
+})
+el('setup-install-deps')?.addEventListener('click', async () => {
+  if (!el('setup-consent-deps').checked) { setupMsg('Please agree to the dependency download first.', true); return }
+  const r = await fetch(`${API_BASE_URL}/setup/local/consent-install`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ consent: true }),
+  })
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) { setupMsg(data.error || 'Install failed to start', true); return }
+  setupMsg('Installing dependencies. This can take a while; restart the app when it finishes.', false)
+  pollSetupJob(data.job_id, () => loadSetup())
+})
+el('setup-download-custom')?.addEventListener('click', async () => {
+  const repo = el('setup-custom-model').value.trim()
+  if (!repo) { setupMsg('Enter a Hugging Face model ID.', true); return }
+  if (!el('setup-consent-license').checked) { setupMsg('Please accept the model license first.', true); return }
+  const r = await fetch(`${API_BASE_URL}/setup/local/models/download`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ repo_id: repo, accept_license: true }),
+  })
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) { setupMsg(data.error || 'Download failed to start', true); return }
+  setupMsg('Download started…', false)
+  pollSetupJob(data.job_id, () => { loadSetup(); if (state.source === 'local') loadModels() })
+})
+el('setup-dismiss')?.addEventListener('click', () => { el('setup-panel').hidden = true })
+loadSetup()
 

@@ -6,7 +6,7 @@ from .settings import config
 from .extensions import init_cors
 from .core.urls import blueprint as base_blueprint
 from .db import SQLiteLogHandler, create_engine_and_factory
-from .db.repositories import GenerationRepository
+from .db.repositories import GenerationRepository, SettingsRepository
 from .services import GenerationService
 from .storage import save_image
 
@@ -51,6 +51,12 @@ def init_database(app: Flask):
     )
     app.extensions["db_engine"] = engine
     app.extensions["db_session_factory"] = factory
+    app.extensions["settings_repository"] = SettingsRepository(factory)
+    # Stored OpenRouter key takes effect immediately; env/config wins.
+    if not app.config.get("OPENROUTER_API_KEY"):
+        stored = app.extensions["settings_repository"].get("openrouter_api_key")
+        if stored:
+            app.config["OPENROUTER_API_KEY"] = stored
     repository = GenerationRepository(factory)
     app.extensions["generation_repository"] = repository
     app.extensions["generation_service"] = GenerationService(

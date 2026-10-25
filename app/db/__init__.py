@@ -9,13 +9,15 @@ from .engine import (
     resolve_database_url,
 )
 from .logger import SQLiteLogHandler, make_sqlite_log_handler
-from .models import AppLog, Base, Generation
-from .repositories import AppLogRepository, GenerationRepository
+from .models import AppLog, AppSetting, Base, Generation
+from .repositories import AppLogRepository, GenerationRepository, SettingsRepository
 
 __all__ = [
     "AppLog",
     "AppLogRepository",
+    "AppSetting",
     "Base",
+    "SettingsRepository",
     "DEFAULT_DATABASE_PATH",
     "Generation",
     "GenerationRepository",

@@ -48,9 +48,15 @@ def _openrouter_factory() -> GenerationProvider:
     return OpenRouterProvider()
 
 
+def _local_factory() -> GenerationProvider:
+    from .local import LocalProvider
+
+    return LocalProvider()
+
+
 register_provider("openrouter", _openrouter_factory)
-# Future providers register the same way, e.g.:
-# register_provider("local", _local_factory)
+# Availability (deps installed) gates use, not registration.
+register_provider("local", _local_factory)
 
 
 def list_sources() -> list[Source]:

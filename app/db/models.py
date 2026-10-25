@@ -68,6 +68,26 @@ class Generation(Base):
     )
 
 
+class AppSetting(Base):
+    """Key/value app settings: setup state and server-side secrets.
+
+    Values are stored as text; JSON is encoded by the repository.
+    Secret values (e.g. the OpenRouter API key) live only here or in
+    the process environment and are never returned by the API.
+    """
+
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(128), primary_key=True)
+    value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=_utcnow,
+        onupdate=_utcnow,
+    )
+
+
 class AppLog(Base):
     """One row of the ``app_logs`` table: an application log record."""
 

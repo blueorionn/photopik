@@ -23,9 +23,14 @@ from ..types.generation import GenerationRequest
 
 class GetTextToImageModels(MethodView):
     def get(self):
+        source = request.args.get("source", "openrouter")
+        if source not in ("openrouter", "local"):
+            return jsonify({"error": f"Unknown source '{source}'"}), 400
         try:
-            provider = get_provider("openrouter")
+            provider = get_provider(source)
             return jsonify(provider.list_models()), 200
+        except UnknownProviderError as exc:
+            return jsonify({"error": str(exc)}), 503
         except ProviderUnavailableError as exc:
             current_app.logger.error("Model provider unavailable: %s", exc)
             return jsonify({"error": str(exc)}), 503

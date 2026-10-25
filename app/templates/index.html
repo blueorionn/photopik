@@ -22,12 +22,46 @@
     </div>
   </header>
 
+  <section class="setup-panel" id="setup-panel" aria-labelledby="setup-h" hidden>
+    <h2 id="setup-h" class="section-title">Set up Photopik</h2>
+    <p class="hint" id="setup-status">Checking setup…</p>
+    <div class="setup-grid">
+      <div class="field">
+        <label class="field-label" for="setup-api-key">Option 1 — OpenRouter</label>
+        <input id="setup-api-key" type="password" class="input" placeholder="sk-or-..." autocomplete="off" />
+        <small class="hint">Stored only on this server. Never sent back to the browser.</small>
+        <button type="button" class="btn" id="setup-save-key">Save OpenRouter key</button>
+      </div>
+      <div class="field">
+        <label class="field-label">Option 2 — Local model</label>
+        <small class="hint" id="setup-local-info">Checking local readiness…</small>
+        <label class="check-label"><input type="checkbox" id="setup-consent-deps" /> I agree to download the ML dependencies (several GB)</label>
+        <button type="button" class="btn" id="setup-install-deps">Install local dependencies</button>
+        <div id="setup-catalog"></div>
+        <label class="field-label" for="setup-custom-model">Custom Hugging Face model ID <em>advanced</em></label>
+        <input id="setup-custom-model" type="text" class="input" placeholder="org/model-name" />
+        <label class="check-label"><input type="checkbox" id="setup-consent-license" /> I accept the selected model license</label>
+        <button type="button" class="btn" id="setup-download-custom">Download custom model</button>
+      </div>
+    </div>
+    <p class="error-text" id="setup-message" role="alert" hidden></p>
+    <button type="button" class="btn" id="setup-dismiss">Continue to generator</button>
+  </section>
+
   <div class="layout">
     <aside class="sidebar" aria-label="Generation settings">
       <section class="section" aria-labelledby="conn-h">
-        <h2 id="conn-h" class="section-title">
-          Model <span class="section-title-muted">via OpenRouter</span>
-        </h2>
+        <h2 id="conn-h" class="section-title">Model</h2>
+        <div class="field">
+          <label for="source" class="field-label">Provider</label>
+          <div class="select-wrap">
+            <select id="source" class="select">
+              <option value="openrouter">OpenRouter</option>
+              <option value="local">Local</option>
+            </select>
+            <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
         <div class="field">
           <label for="model" class="field-label">Model</label>
           <div class="select-wrap">
