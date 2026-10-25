@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <img src="{{ url_for('static', filename='photopik.svg') }}" alt="" class="brand-logo" />
+      <div>
+        <strong class="brand-name">Photopik</strong>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button
+        type="button"
+        id="theme-toggle"
+        aria-label="Switch to dark theme"
+        title="Switch to dark theme"
+        class="theme-btn"
+      >
+        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Generation settings">
+      <section class="section" aria-labelledby="conn-h">
+        <h2 id="conn-h" class="section-title">
+          Model <span class="section-title-muted">via OpenRouter</span>
+        </h2>
+        <div class="field">
+          <label for="model" class="field-label">Model</label>
+          <div class="select-wrap">
+            <select id="model" disabled class="select"></select>
+            <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <small class="hint" id="model-loading">Loading models from the API server…</small>
+          <small class="error-text" id="model-error" role="alert" hidden></small>
+          <button type="button" class="btn" id="model-retry" hidden>Retry</button>
+          <small class="hint" id="model-description" hidden></small>
+          <small class="hint" id="model-empty" hidden>No models returned by the API server.</small>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="prompt-h">
+        <h2 id="prompt-h" class="section-title">Prompt</h2>
+        <div class="field">
+          <label for="prompt" class="field-label">Prompt <em>required</em></label>
+          <textarea
+            id="prompt"
+            rows="4"
+            placeholder="A cozy coffee shop on a rainy night, neon sign, reflections on wet pavement"
+            class="input textarea-prompt"
+          ></textarea>
+          <small class="error-text" id="prompt-error" role="alert" hidden></small>
+          <small class="hint" id="prompt-hint">0 characters. Be specific about subject, style, and lighting.</small>
+        </div>
+        <div class="field">
+          <label for="negative" class="field-label">Negative prompt <em>optional</em></label>
+          <small class="hint" id="negative-hint"></small>
+          <textarea
+            id="negative"
+            rows="2"
+            placeholder="blurry, low quality, distorted hands"
+            class="input textarea-resize"
+          ></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="count-h">
+        <h2 id="count-h" class="section-title">Image count</h2>
+        <div class="field">
+          <div class="count-row">
+            <button type="button" aria-label="Decrease count" id="count-minus" class="count-btn">−</button>
+            <output aria-live="polite" class="count-value" id="count-value">1</output>
+            <button type="button" aria-label="Increase count" id="count-plus" class="count-btn">+</button>
+          </div>
+          <small class="hint">Variants per run. More images cost more on OpenRouter.</small>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="size-h">
+        <h2 id="size-h" class="section-title">Size &amp; output</h2>
+        <div class="size-grid">
+          <div class="field">
+            <label for="aspect-ratio" class="field-label">Aspect ratio</label>
+            <div class="select-wrap">
+              <select id="aspect-ratio" class="select"></select>
+              <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <label for="resolution" class="field-label">Resolution</label>
+            <div class="select-wrap">
+              <select id="resolution" class="select"></select>
+              <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <label for="output-format" class="field-label">Output format</label>
+            <div class="select-wrap">
+              <select id="output-format" class="select"></select>
+              <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+          <div class="size-output-wrap">
+            <p class="size-output">Output size: <span class="size-output-value" id="output-size"></span><span id="output-size-custom" hidden> · custom</span></p>
+          </div>
+        </div>
+      </section>
+
+      <details class="advanced">
+        <summary class="advanced-summary">Advanced settings</summary>
+        <div class="advanced-inner">
+          <div class="field">
+            <label for="seed" class="field-label">Seed</label>
+            <div class="row">
+              <input id="seed" type="number" class="input" />
+              <button type="button" class="btn" id="seed-randomize">Randomize</button>
+            </div>
+            <label class="check-label">
+              <input type="checkbox" id="seed-random" checked />
+              New random seed every run
+            </label>
+            <small class="hint" id="seed-hint"></small>
+          </div>
+          <div class="field" id="quality-field" hidden>
+            <label class="field-label">Quality</label>
+            <div class="quality-group" role="group" aria-label="Quality" id="quality-group"></div>
+            <small class="hint">Higher quality usually costs more and takes longer.</small>
+          </div>
+          <div class="field">
+            <label class="field-label">Custom dimensions</label>
+            <label class="check-label">
+              <input type="checkbox" id="custom-size" />
+              Override aspect ratio / resolution
+            </label>
+            <div class="row">
+              <input type="number" aria-label="Width" min="256" max="4096" step="8" id="width" class="input" disabled />
+              <input type="number" aria-label="Height" min="256" max="4096" step="8" id="height" class="input" disabled />
+            </div>
+            <small class="hint">Width × height in pixels, 256–4096. Some models reject uncommon sizes.</small>
+          </div>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button type="button" id="generate" class="btn-generate">Generate image</button>
+        <button type="button" class="btn-reset" id="reset">Reset all settings</button>
+        <p class="alert-error" role="alert" id="gen-error" hidden></p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="preview-section" id="preview-section" aria-labelledby="preview-h">
+        <h2 id="preview-h" class="section-title">Preview</h2>
+        <div class="preview-box" id="preview-box">
+          <div class="preview-center" id="preview-generating" role="status" hidden>
+            <div class="spinner" aria-hidden="true"></div>
+            <strong class="preview-title">Generating…</strong>
+            <p class="preview-text" id="preview-generating-text"></p>
+          </div>
+          <div class="preview-center" id="preview-error" role="alert" hidden>
+            <strong class="preview-title preview-title-danger">Generation failed</strong>
+            <p class="preview-text" id="preview-error-text"></p>
+          </div>
+          <img id="preview-img" class="preview-img" alt="" hidden />
+          <div class="preview-center" id="preview-empty">
+            <strong class="preview-title">No image yet</strong>
+            <p class="preview-text">Write a prompt on the left and choose Generate image. Your result and settings will appear here.</p>
+          </div>
+        </div>
+        <div id="preview-details" hidden>
+          <p class="result-prompt" id="result-prompt"></p>
+          <div class="chips" aria-label="Result details" id="result-chips"></div>
+          <div class="result-actions">
+            <a class="btn" id="result-download" href="">Download</a>
+            <button type="button" class="btn" id="result-reuse-seed">Reuse this seed</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="history-section" aria-labelledby="history-h">
+        <h2 id="history-h" class="section-title">Recent in this session</h2>
+        <p class="history-empty" id="history-empty">Nothing generated yet in this session. History is not saved to a database yet.</p>
+        <div class="history-grid" id="history-grid" hidden></div>
+      </section>
+    </main>
+  </div>
+</div>
+{% endblock %}

@@ -1,16 +1,12 @@
 """Base URLs."""
 
-from flask import Blueprint, jsonify
+from flask import Blueprint
+from .pages import index
 from .views import GetTextToImageModels, GenerateBase64Image
 
 blueprint = Blueprint("base", __name__)
 
-
-@blueprint.route("/")
-def index():
-    return jsonify({"message": "Hello World!"}), 200
-
-
+blueprint.add_url_rule("/", view_func=index)
 blueprint.add_url_rule(
     "/models", view_func=GetTextToImageModels.as_view("text_to_image_models")
 )

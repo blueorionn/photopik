@@ -53,6 +53,26 @@ def test_record_roundtrip_preserves_local_and_provider_fields(tmp_path):
     assert repo.get_by_id(created.id).provider_request_id == "req-123"
 
 
+def test_index_page_renders_jinja_ui(tmp_path):
+    config = TestingConfig()
+    config.DATABASE_PATH = str(tmp_path / "app.sqlite3")
+    config.OUTPUT_DIR = str(tmp_path / "output")
+    app = create_app(config)
+    client = app.test_client()
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/html"
+    html = resp.get_data(as_text=True)
+    assert "Photopik" in html
+    assert 'id="model"' in html
+    assert 'id="prompt"' in html
+    assert 'id="preview-box"' in html
+    assert 'id="history-grid"' in html
+    assert client.get("/static/css/app.css").status_code == 200
+    assert client.get("/static/js/app.js").status_code == 200
+    assert client.get("/static/photopik.svg").status_code == 200
+
+
 def test_generate_endpoint_uses_service_and_logs_to_db(tmp_path):
     config = TestingConfig()
     config.DATABASE_PATH = str(tmp_path / "app.sqlite3")
