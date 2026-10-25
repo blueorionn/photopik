@@ -5,7 +5,7 @@ from pathlib import Path
 
 from app.db import create_engine_and_factory
 
-_COMMAND = Path(__file__).resolve().parent.parent / "commands" / "db_health.py"
+_COMMAND = Path(__file__).resolve().parent.parent / "commands" / "health_check.py"
 _spec = importlib.util.spec_from_file_location("db_health", _COMMAND)
 db_health = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(db_health)

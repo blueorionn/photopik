@@ -1,7 +1,7 @@
 """Simple database health check.
 
 Usage:
-    python commands/db_health.py [--database-path PATH]
+    python commands/health_check.py [--database-path PATH]
 
 Checks that the database is reachable, answers ``SELECT 1``, and has
 the expected tables. Prints ``OK``/``FAIL`` and exits 0/1 so it can be
