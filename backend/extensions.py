@@ -2,7 +2,6 @@
 
 from flask import Flask
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 
 
 # Flask Cors Configuration
@@ -17,10 +16,3 @@ def init_cors(app: Flask):
             }
         },
     )
-
-
-db = SQLAlchemy()
-
-
-def init_db(app: Flask):
-    db.init_app(app)
